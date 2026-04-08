@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 0
+    path: Assets/Scenes/DemoScene.unity
+    guid: 421a80b724c0eb141947f10985deb851
+  - enabled: 1
+    path: Assets/PassthroughCameraApiSamples/StartScene/StartScene.unity
+    guid: 69e1b31c45bac42f88f75017ee404de1
+  - enabled: 1
+    path: Assets/PassthroughCameraApiSamples/MultiObjectDetection/MultiObjectDetection.unity
+    guid: 20c230cce46443841b5727b1d6100bfc
+  - enabled: 1
+    path: Assets/PassthroughCameraApiSamples/BrightnessEstimation/BrightnessEstimation.unity
+    guid: 8ea13e682474e1748965f8e21972f2b2
+  - enabled: 1
+    path: Assets/PassthroughCameraApiSamples/CameraToWorld/CameraToWorld.unity
+    guid: 756785b371a4f49438b7e2148816e892
+  - enabled: 1
+    path: Assets/PassthroughCameraApiSamples/ShaderSample/ShaderSample.unity
+    guid: 708e8dca6055146b28afe2481f141457
+  - enabled: 1
+    path: Assets/PassthroughCameraApiSamples/CameraViewer/CameraViewer.unity
+    guid: ad5bb12b10679b840999aa322aa7a491
+  m_configObjects:
+    Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 9f975aa7d6dbba945b83775746a5676f, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 208d952f004984b5f93617acf3e52de3, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: b95ced433e2934713bf70c223a8487e5, type: 2}
+  m_UseUCBPForAssetBundles: 0

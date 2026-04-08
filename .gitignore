@@ -1,0 +1,52 @@
+# Unity Generated Files
+Library/
+Logs/
+Temp/
+obj/
+*.csproj
+*.sln
+*.unityproj
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.opendb
+*.VC.db
+*.db
+*.lock
+
+# Build Artifacts
+Build/
+Builds/
+*.apk
+*.aab
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project Specific
+.env
+*.key
+*.pem
+
+# Documentation (keep only README)
+TUTORIAL_ZH.md
+PROJECT_STRUCTURE.md
+COMPLETION_CHECKLIST.md
+GET_STARTED.md
+INDEX.md

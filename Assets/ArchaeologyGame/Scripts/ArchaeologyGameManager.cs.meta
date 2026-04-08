@@ -1,0 +1,12 @@
+fileFormatVersion: 2
+guid: a9af1446f876946ceb117ef16b7b7f3b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - statueObject: {fileID: 919132149155446097, guid: 90444faba421d410896339dc4ec69251, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

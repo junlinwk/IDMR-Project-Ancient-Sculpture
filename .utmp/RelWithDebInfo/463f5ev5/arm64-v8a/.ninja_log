@@ -1,0 +1,12 @@
+# ninja log v5
+77	488	7973661755364043	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	e0af023a82c65062
+491	816	7973661758700697	C:/Users/USER/IDMR-Project-Ancient-Sculpture/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/463f5ev5/obj/arm64-v8a/libswappywrapper.so	dc5a4c73716cc154
+35	1544	7973661767376203	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	b16e6051cfa25c9a
+44	1553	7973661767355545	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	e57122187e189dd9
+8	1556	7973661767438375	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	5a00dbcccbe6453e
+65	1609	7973661768094966	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	3df1fc1ea04a036f
+16	1624	7973661768218773	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	2d2272b689a7730a
+54	1716	7973661769131527	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	3e4cddd109d29d97
+27	1839	7973661770415076	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	66a66536b7d1395a
+0	1929	7973661771295498	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	2048670b8cba68c5
+1929	2044	7973661772460531	C:/Users/USER/IDMR-Project-Ancient-Sculpture/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/463f5ev5/obj/arm64-v8a/libgame.so	2c0236b26d2d691b

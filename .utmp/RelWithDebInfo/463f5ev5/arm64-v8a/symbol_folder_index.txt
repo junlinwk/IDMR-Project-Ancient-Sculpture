@@ -1,0 +1,1 @@
+C:\Users\USER\IDMR-Project-Ancient-Sculpture\Library\Bee\Android\Prj\IL2CPP\Gradle\unityLibrary\build\intermediates\cxx\RelWithDebInfo\463f5ev5\obj\arm64-v8a

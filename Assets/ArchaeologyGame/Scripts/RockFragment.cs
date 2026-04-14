@@ -17,6 +17,17 @@ public class RockFragment : MonoBehaviour
     private int currentHits;
     private int hitCount = 0;
     private ArchaeologyGameManager gameManager;
+    private Rigidbody rb;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        if (rb != null)
+        {
+            // Keep rock fragments in place until they are explicitly hit or destroyed.
+            rb.useGravity = false;
+        }
+    }
 
     public void Initialize(ArchaeologyGameManager manager)
     {

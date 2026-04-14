@@ -14,8 +14,8 @@ public class Pickaxe : WeaponBase
     protected override void Start()
     {
         base.Start();
-        // Ensure this object is tagged as "Pickaxe" for rock fragment detection
-        gameObject.tag = "Pickaxe";
+        // Ensure this object is tagged as "Pickaxe" for rock fragment detection.
+        TrySetTag("Pickaxe");
     }
 
     private void OnCollisionEnter(Collision collision)

@@ -10,6 +10,8 @@ using UnityEngine;
 /// - Trigger button mapping (GetIndexTriggerButton, IsIndexTriggerHeld)
 /// - Haptic feedback triggering (TriggerHaptic)
 /// </summary>
+[RequireComponent(typeof(OVRGrabbable))]
+
 public abstract class WeaponBase : MonoBehaviour
 {
     protected OVRGrabbable grabbable;
@@ -31,7 +33,33 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected virtual void Start()
     {
-        feedback = FindObjectOfType<FeedbackManager>();
+        feedback = Object.FindFirstObjectByType<FeedbackManager>();
+
+        // Warn early if the scene does not contain any OVR grabber.
+        if (Object.FindFirstObjectByType<OVRGrabber>() == null)
+        {
+            Debug.LogWarning(
+                "WeaponBase: No OVRGrabber found in the scene. " +
+                "Weapons can be grabbable, but the hands/controllers also need an OVRGrabber.");
+        }
+    }
+
+    /// <summary>
+    /// Assigns a tag only when the tag exists in the project's TagManager.
+    /// This avoids a runtime exception from GameObject.tag when the tag has not been defined.
+    /// </summary>
+    protected bool TrySetTag(string tagName)
+    {
+        try
+        {
+            gameObject.tag = tagName;
+            return true;
+        }
+        catch (UnityException)
+        {
+            Debug.LogError($"WeaponBase: Tag '{tagName}' is not defined in ProjectSettings/TagManager.asset.");
+            return false;
+        }
     }
 
     /// <summary>

@@ -13,8 +13,8 @@ public class Hammer : WeaponBase
     protected override void Start()
     {
         base.Start();
-        // Ensure this object is tagged as "Hammer" for detection
-        gameObject.tag = "Hammer";
+        // Ensure this object is tagged as "Hammer" for detection.
+        TrySetTag("Hammer");
     }
 
     private void OnCollisionEnter(Collision collision)

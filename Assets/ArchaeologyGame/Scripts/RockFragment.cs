@@ -13,10 +13,14 @@ public class RockFragment : MonoBehaviour
 
     [Header("Debris Settings")]
     [SerializeField] private GameObject debrisParticlePrefab; // Reference to Debries prefab
+    [SerializeField] private float dropShakeIntensity = 0.04f;
+    [SerializeField] private float dropShakeDuration = 0.18f;
+    [SerializeField] private bool logRockHits = true;
 
     private int currentHits;
     private int hitCount = 0;
     private ArchaeologyGameManager gameManager;
+    private FeedbackManager feedback;
     private Rigidbody rb;
 
     private void Awake()
@@ -27,6 +31,8 @@ public class RockFragment : MonoBehaviour
             // Keep rock fragments in place until they are explicitly hit or destroyed.
             rb.useGravity = false;
         }
+
+        feedback = Object.FindFirstObjectByType<FeedbackManager>();
     }
 
     public void Initialize(ArchaeologyGameManager manager)
@@ -40,6 +46,10 @@ public class RockFragment : MonoBehaviour
         // Check if this is a pickaxe hit
         if (collision.gameObject.CompareTag("Pickaxe"))
         {
+            if (logRockHits)
+            {
+                Debug.Log($"{nameof(RockFragment)} on {gameObject.name} was hit by {collision.gameObject.name}.");
+            }
             Hit();
         }
     }
@@ -47,6 +57,11 @@ public class RockFragment : MonoBehaviour
     public void Hit()
     {
         hitCount++;
+
+        if (logRockHits)
+        {
+            Debug.Log($"{nameof(RockFragment)} hit count: {hitCount}/{currentHits} on {gameObject.name}.");
+        }
 
         // Play hit feedback
         if (hitParticles != null)
@@ -74,6 +89,16 @@ public class RockFragment : MonoBehaviour
 
     private void Destroy()
     {
+        if (logRockHits)
+        {
+            Debug.Log($"{nameof(RockFragment)} destroyed on {gameObject.name}.");
+        }
+
+        if (feedback != null)
+        {
+            feedback.PlayRockDropFeedback(transform.position, dropShakeIntensity, dropShakeDuration);
+        }
+
         // Spawn ore
         SpawnOre();
 

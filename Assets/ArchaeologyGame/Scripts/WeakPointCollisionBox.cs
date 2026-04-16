@@ -16,6 +16,8 @@ public class WeakPointCollisionBox : MonoBehaviour
     [Header("Hit Settings")]
     [SerializeField] private int hitsBeforeDrop = 3;
     [SerializeField] private string pickaxeTag = "Pickaxe";
+    [SerializeField] private float hitHapticAmplitude = 0.45f;
+    [SerializeField] private float hitHapticDuration = 0.08f;
 
     [Header("Colors")]
     [SerializeField] private Color initialColor = Color.green;
@@ -23,11 +25,15 @@ public class WeakPointCollisionBox : MonoBehaviour
     [SerializeField] private Color hitTwoColor = Color.red;
 
     [Header("Drop Settings")]
-    [SerializeField] private bool forceParentGravityOnDrop = true;
+    [SerializeField] private bool hideParentRenderersOnDrop = false;
+    [SerializeField] private float floorY = 0f;
+    [SerializeField] private float landingVolume = 1f;
+    [SerializeField] private bool logWeakPointHits = true;
 
     private BoxCollider weakPointCollider;
     private Renderer[] targetRenderers;
-    private Rigidbody parentRigidbody;
+    private FeedbackManager feedback;
+    private Transform parentStone;
     private int hitCount;
     private bool dropped;
 
@@ -37,7 +43,20 @@ public class WeakPointCollisionBox : MonoBehaviour
         weakPointCollider.isTrigger = true;
 
         targetRenderers = GetComponentsInChildren<Renderer>(true);
-        parentRigidbody = GetComponentInParent<Rigidbody>();
+        RockFragment rockFragment = GetComponentInParent<RockFragment>();
+        if (rockFragment != null)
+        {
+            parentStone = rockFragment.transform;
+        }
+        else if (transform.parent != null)
+        {
+            parentStone = transform.parent;
+        }
+        else
+        {
+            parentStone = transform;
+        }
+        feedback = Object.FindFirstObjectByType<FeedbackManager>();
     }
 
     private void Start()
@@ -57,6 +76,12 @@ public class WeakPointCollisionBox : MonoBehaviour
             return;
         }
 
+        if (logWeakPointHits)
+        {
+            Debug.Log($"{nameof(WeakPointCollisionBox)} hit on {gameObject.name} by {other.name}.");
+        }
+
+        PlayHitFeedback(other);
         hitCount++;
 
         if (hitCount >= hitsBeforeDrop)
@@ -66,6 +91,27 @@ public class WeakPointCollisionBox : MonoBehaviour
         }
 
         ApplyStateVisual();
+    }
+
+    private void PlayHitFeedback(Collider other)
+    {
+        Vector3 impactPoint = transform.position;
+        if (other != null)
+        {
+            impactPoint = other.ClosestPoint(transform.position);
+        }
+
+        Pickaxe pickaxe = other != null ? other.GetComponentInParent<Pickaxe>() : null;
+        if (pickaxe != null)
+        {
+            pickaxe.PlayStrikeFeedback(impactPoint, hitHapticAmplitude, hitHapticDuration);
+            return;
+        }
+
+        if (feedback != null)
+        {
+            feedback.PlayPickaxeStrikeSound(impactPoint);
+        }
     }
 
     private bool IsPickaxe(Collider other)
@@ -126,20 +172,21 @@ public class WeakPointCollisionBox : MonoBehaviour
     {
         dropped = true;
 
-        if (forceParentGravityOnDrop)
+        if (logWeakPointHits)
         {
-            Rigidbody rb = GetOrCreateParentRigidbody();
-            if (rb != null)
-            {
-                rb.isKinematic = false;
-                rb.useGravity = true;
-                rb.constraints = RigidbodyConstraints.None;
-            }
+            Debug.Log($"{nameof(WeakPointCollisionBox)} dropping stone on {gameObject.name}.");
         }
+
+        if (feedback != null)
+        {
+            feedback.PlayRockDropFeedback(transform.position);
+        }
+
+        EnsureLandingFeedback();
 
         weakPointCollider.enabled = false;
 
-        if (targetRenderers != null)
+        if (hideParentRenderersOnDrop && targetRenderers != null)
         {
             foreach (Renderer renderer in targetRenderers)
             {
@@ -151,32 +198,20 @@ public class WeakPointCollisionBox : MonoBehaviour
         }
     }
 
-    private Rigidbody GetOrCreateParentRigidbody()
+    private void EnsureLandingFeedback()
     {
-        if (parentRigidbody != null)
+        if (parentStone == null)
         {
-            return parentRigidbody;
+            return;
         }
 
-        Transform parent = transform.parent;
-        if (parent != null)
+        RockLandingFeedback landingFeedback = parentStone.GetComponent<RockLandingFeedback>();
+        if (landingFeedback == null)
         {
-            parentRigidbody = parent.GetComponent<Rigidbody>();
-            if (parentRigidbody == null)
-            {
-                parentRigidbody = parent.gameObject.AddComponent<Rigidbody>();
-            }
-
-            return parentRigidbody;
+            landingFeedback = parentStone.gameObject.AddComponent<RockLandingFeedback>();
         }
 
-        parentRigidbody = GetComponent<Rigidbody>();
-        if (parentRigidbody == null)
-        {
-            parentRigidbody = gameObject.AddComponent<Rigidbody>();
-        }
-
-        return parentRigidbody;
+        landingFeedback.Arm(floorY, landingVolume);
     }
 
     private void Reset()

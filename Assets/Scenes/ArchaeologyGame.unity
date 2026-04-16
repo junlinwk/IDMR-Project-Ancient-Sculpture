@@ -239,6 +239,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &73531338
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -594,10 +597,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &332054157
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1214,6 +1222,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &533052119
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1764,6 +1775,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Pickaxe
   pickaxeHapticAmplitude: 0.7
   pickaxeHapticDuration: 0.15
+  logPickaxeHits: 1
 --- !u!1 &654338953
 GameObject:
   m_ObjectHideFlags: 0
@@ -1813,10 +1825,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &654338956
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2470,6 +2487,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &865023449
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2639,6 +2659,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &907896448
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2808,6 +2831,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &918609599
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3222,15 +3248,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 53f3ce67a0ced45f8b0a6e8556867946, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 1.025
+      value: 1.648
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 53f3ce67a0ced45f8b0a6e8556867946, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.262
+      value: -2.098
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 53f3ce67a0ced45f8b0a6e8556867946, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.383
+      value: -0.101
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 53f3ce67a0ced45f8b0a6e8556867946, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3323,6 +3349,66 @@ Transform:
   m_Children:
   - {fileID: 2050571673}
   m_Father: {fileID: 1443344194}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1062984172
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1062984174}
+  - component: {fileID: 1062984173}
+  m_Layer: 0
+  m_Name: feedback
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1062984173
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1062984172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1bdb6d2492e94286a7f049037e339af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FeedbackManager
+  hitParticlePrefab: {fileID: 0}
+  deathParticlePrefab: {fileID: 0}
+  muzzleFlashPrefab: {fileID: 0}
+  shootSFX: {fileID: 0}
+  swordSwingSFX: {fileID: 0}
+  impactSFX: {fileID: 0}
+  enemyDeathSFX: {fileID: 0}
+  playerHitSFX: {fileID: 0}
+  pickaxeStrikeSFX: {fileID: 0}
+  rockDropSFX: {fileID: 0}
+  rockLandSFX: {fileID: 0}
+  useProceduralAudio: 1
+  screenShake: {fileID: 0}
+  defaultRockShakeIntensity: 0.04
+  defaultRockShakeDuration: 0.18
+  logFeedbackEvents: 1
+--- !u!4 &1062984174
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1062984172}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.21464, y: 0.59776, z: -0.47103}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &1062984176
 Rigidbody:
@@ -3532,6 +3618,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &1110835669
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -3917,6 +4006,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &1141532991
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4525,10 +4617,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &1355599166
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4852,10 +4949,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &1442375613
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4996,6 +5098,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!1001 &1501929989
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5116,6 +5221,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &1501929993
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5285,6 +5393,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &1524439873
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -5383,10 +5494,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &1529117629
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5740,10 +5856,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &1593909883
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5928,10 +6049,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &1695716650
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6146,10 +6272,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &1832374515
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6277,10 +6408,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &1842983711
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6408,10 +6544,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &1861944838
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6653,6 +6794,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &1887501917
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6822,6 +6966,9 @@ MonoBehaviour:
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
   debrisParticlePrefab: {fileID: 0}
+  dropShakeIntensity: 0.04
+  dropShakeDuration: 0.18
+  logRockHits: 1
 --- !u!54 &1913375630
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6920,10 +7067,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &1952681932
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7015,6 +7167,7 @@ GameObject:
   - component: {fileID: 1990828902}
   - component: {fileID: 1990828901}
   - component: {fileID: 1990828900}
+  - component: {fileID: 1990828905}
   m_Layer: 0
   m_Name: '[BuildingBlock] Camera Rig'
   m_TagString: Untagged
@@ -7183,6 +7336,19 @@ Transform:
   - {fileID: 1115572478}
   m_Father: {fileID: 1158337045}
   m_LocalEulerAnglesHint: {x: 0, y: -126.03, z: 0}
+--- !u!114 &1990828905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1990828899}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4294e97d2470a4b45b0fb5ddde16cdae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScreenShake
+  target: {fileID: 0}
 --- !u!1 &2050571672
 GameObject:
   m_ObjectHideFlags: 0
@@ -7376,10 +7542,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
+  hitHapticAmplitude: 0.45
+  hitHapticDuration: 0.08
   initialColor: {r: 0, g: 1, b: 0, a: 1}
   hitOneColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   hitTwoColor: {r: 1, g: 0, b: 0, a: 1}
-  forceParentGravityOnDrop: 1
+  hideParentRenderersOnDrop: 1
+  floorY: 0
+  landingVolume: 1
+  logWeakPointHits: 1
 --- !u!65 &2137010142
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7470,3 +7641,4 @@ SceneRoots:
   - {fileID: 507114825}
   - {fileID: 562183486}
   - {fileID: 1714126129}
+  - {fileID: 1062984174}

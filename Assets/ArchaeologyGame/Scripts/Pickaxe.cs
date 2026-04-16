@@ -10,6 +10,7 @@ public class Pickaxe : WeaponBase
     [Header("Pickaxe Settings")]
     [SerializeField] private float pickaxeHapticAmplitude = 0.7f;
     [SerializeField] private float pickaxeHapticDuration = 0.15f;
+    [SerializeField] private bool logPickaxeHits = true;
 
     protected override void Start()
     {
@@ -20,11 +21,43 @@ public class Pickaxe : WeaponBase
 
     private void OnCollisionEnter(Collision collision)
     {
-        // Check if this is being held and colliding with a rock
-        if (IsHeld && collision.gameObject.CompareTag("Rock"))
+        if (logPickaxeHits)
         {
-            // Haptic feedback on strike
-            TriggerHaptic(pickaxeHapticAmplitude, pickaxeHapticDuration);
+            Debug.Log($"{nameof(Pickaxe)} collided with {collision.gameObject.name}.");
+        }
+
+        if (!IsHeld)
+        {
+            return;
+        }
+
+        RockFragment rockFragment = collision.gameObject.GetComponentInParent<RockFragment>();
+        if (rockFragment == null)
+        {
+            return;
+        }
+
+        if (logPickaxeHits)
+        {
+            Debug.Log($"{nameof(Pickaxe)} hit RockFragment on {collision.gameObject.name}.");
+        }
+
+        Vector3 impactPoint = transform.position;
+        if (collision.contactCount > 0)
+        {
+            impactPoint = collision.GetContact(0).point;
+        }
+
+        PlayStrikeFeedback(impactPoint, pickaxeHapticAmplitude, pickaxeHapticDuration);
+    }
+
+    public void PlayStrikeFeedback(Vector3 impactPoint, float amplitude, float duration)
+    {
+        TriggerHaptic(amplitude, duration);
+
+        if (feedback != null)
+        {
+            feedback.PlayPickaxeStrikeSound(impactPoint);
         }
     }
 }

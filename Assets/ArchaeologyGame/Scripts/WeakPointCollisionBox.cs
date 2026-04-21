@@ -16,6 +16,8 @@ public class WeakPointCollisionBox : MonoBehaviour
     [Header("Hit Settings")]
     [SerializeField] private int hitsBeforeDrop = 3;
     [SerializeField] private string pickaxeTag = "Pickaxe";
+    [Range(0f, 1f)]
+    [SerializeField] private float hitSuccessChance = 1.0f;
     [SerializeField] private float hitHapticAmplitude = 0.45f;
     [SerializeField] private float hitHapticDuration = 0.08f;
 
@@ -82,6 +84,17 @@ public class WeakPointCollisionBox : MonoBehaviour
         }
 
         PlayHitFeedback(other);
+
+        if (Random.value > hitSuccessChance)
+        {
+            if (logWeakPointHits)
+            {
+                Debug.Log($"{nameof(WeakPointCollisionBox)} miss on {gameObject.name} by {other.name}.");
+            }
+
+            return;
+        }
+
         hitCount++;
 
         if (hitCount >= hitsBeforeDrop)
@@ -230,5 +243,7 @@ public class WeakPointCollisionBox : MonoBehaviour
         {
             boxCollider.isTrigger = true;
         }
+
+        hitSuccessChance = Mathf.Clamp01(hitSuccessChance);
     }
 }

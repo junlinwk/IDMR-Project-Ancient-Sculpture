@@ -12,11 +12,26 @@ public class Pickaxe : WeaponBase
     [SerializeField] private float pickaxeHapticDuration = 0.15f;
     [SerializeField] private bool logPickaxeHits = true;
 
+    private bool wasHeldLastFrame = false;
+
     protected override void Start()
     {
         base.Start();
         // Ensure this object is tagged as "Pickaxe" for rock fragment detection.
         TrySetTag("Pickaxe");
+    }
+
+    private void Update()
+    {
+        // Log grab state transitions so we can spot simulator / dual-hand issues.
+        if (logPickaxeHits && IsHeld != wasHeldLastFrame)
+        {
+            string grabberName = (grabbable != null && grabbable.grabbedBy != null)
+                ? grabbable.grabbedBy.gameObject.name
+                : "(none)";
+            Debug.Log($"[Pickaxe] IsHeld {wasHeldLastFrame} -> {IsHeld}. grabbedBy={grabberName}, controller={GetHoldingController()}");
+            wasHeldLastFrame = IsHeld;
+        }
     }
 
     private void OnCollisionEnter(Collision collision)

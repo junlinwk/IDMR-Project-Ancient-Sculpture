@@ -23,6 +23,9 @@ public class AnvilStation : MonoBehaviour
     [Tooltip("Particle effect spawned when the upgrade actually triggers.")]
     [SerializeField] private ParticleSystem upgradeParticles;
 
+    [Header("Debug")]
+    [SerializeField] private bool logAnvil = true;
+
     private int hammerHits = 0;
 
     private void Start()
@@ -35,9 +38,18 @@ public class AnvilStation : MonoBehaviour
     {
         ArchaeologyGameManager manager = ArchaeologyGameManager.Instance;
 
+        if (logAnvil)
+        {
+            int ore = manager != null ? manager.GetOreCount() : -1;
+            int cost = manager != null ? manager.GetCurrentUpgradeCost() : -1;
+            int level = manager != null ? manager.GetUpgradeLevel() : -1;
+            Debug.Log($"[AnvilStation] Hit() called. level={level}, ore={ore}, cost={cost}, hammerHits={hammerHits}/{hitsToUpgrade}");
+        }
+
         // Already at max level — nothing to upgrade.
         if (manager != null && manager.IsAtMaxUpgrade())
         {
+            if (logAnvil) Debug.Log("[AnvilStation] REJECTED: pickaxe is already at max upgrade.");
             PlayFail();
             return;
         }
@@ -45,6 +57,7 @@ public class AnvilStation : MonoBehaviour
         // Not enough ore — white hit, no progress.
         if (manager != null && !manager.HasEnoughOreForUpgrade())
         {
+            if (logAnvil) Debug.Log($"[AnvilStation] REJECTED: not enough ore ({manager.GetOreCount()}/{manager.GetCurrentUpgradeCost()}).");
             PlayFail();
             manager.OnUpgradeFailed.Invoke();
             return;
@@ -52,6 +65,7 @@ public class AnvilStation : MonoBehaviour
 
         // Valid hit — count and give feedback.
         hammerHits++;
+        if (logAnvil) Debug.Log($"[AnvilStation] VALID hit. hammerHits now {hammerHits}/{hitsToUpgrade}");
 
         if (anvilSound != null)
         {
@@ -78,7 +92,9 @@ public class AnvilStation : MonoBehaviour
             return;
         }
 
+        if (logAnvil) Debug.Log("[AnvilStation] Threshold reached — calling UpgradePickaxe()");
         bool success = manager.UpgradePickaxe();
+        if (logAnvil) Debug.Log($"[AnvilStation] Upgrade result: {(success ? "SUCCESS" : "FAIL")}. Resetting hammer counter.");
         hammerHits = 0;
 
         if (success && upgradeParticles != null)
@@ -93,6 +109,10 @@ public class AnvilStation : MonoBehaviour
         if (failSound != null)
         {
             AudioSource.PlayClipAtPoint(failSound, transform.position, 0.8f);
+        }
+        else if (logAnvil)
+        {
+            Debug.LogWarning("[AnvilStation] PlayFail: no failSound assigned.");
         }
     }
 }

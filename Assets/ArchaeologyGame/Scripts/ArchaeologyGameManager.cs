@@ -21,6 +21,9 @@ public class ArchaeologyGameManager : MonoBehaviour
     [Tooltip("Extra ore required per subsequent upgrade. Cost = base + (level * increment).")]
     [SerializeField] private int upgradeCostIncrement = 5;
 
+    [Header("Debug")]
+    [SerializeField] private bool logManager = true;
+
     // Events for UI and systems to listen to
     public UnityEvent<int> OnOreCountChanged = new UnityEvent<int>();
     public UnityEvent<int> OnUpgradeLevelChanged = new UnityEvent<int>();
@@ -58,6 +61,7 @@ public class ArchaeologyGameManager : MonoBehaviour
     public void AddOre(int amount = 1)
     {
         oreCount += amount;
+        if (logManager) Debug.Log($"[GameManager] AddOre(+{amount}) -> total={oreCount}");
         OnOreCountChanged.Invoke(oreCount);
     }
 
@@ -95,9 +99,11 @@ public class ArchaeologyGameManager : MonoBehaviour
     {
         if (amount <= 0 || oreCount < amount)
         {
+            if (logManager) Debug.Log($"[GameManager] TrySpendOre({amount}) FAILED — have {oreCount}");
             return false;
         }
         oreCount -= amount;
+        if (logManager) Debug.Log($"[GameManager] TrySpendOre({amount}) OK — remaining={oreCount}");
         OnOreCountChanged.Invoke(oreCount);
         return true;
     }
@@ -119,6 +125,7 @@ public class ArchaeologyGameManager : MonoBehaviour
     {
         if (IsAtMaxUpgrade())
         {
+            if (logManager) Debug.Log($"[GameManager] UpgradePickaxe FAILED — already at max level {upgradeLevel}/{maxUpgradeLevel}");
             OnUpgradeFailed.Invoke();
             return false;
         }
@@ -126,11 +133,13 @@ public class ArchaeologyGameManager : MonoBehaviour
         int cost = GetCurrentUpgradeCost();
         if (!TrySpendOre(cost))
         {
+            if (logManager) Debug.Log($"[GameManager] UpgradePickaxe FAILED — could not spend {cost} ore");
             OnUpgradeFailed.Invoke();
             return false;
         }
 
         upgradeLevel++;
+        if (logManager) Debug.Log($"[GameManager] UpgradePickaxe OK — now level {upgradeLevel}, next cost={GetCurrentUpgradeCost()}");
         OnUpgradeLevelChanged.Invoke(upgradeLevel);
 
         // Notify all rock fragments about the upgrade

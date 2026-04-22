@@ -235,7 +235,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -950,7 +950,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 79904ffb702df406ab4cf73fca24d3d2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.63
+      value: -0.68
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 79904ffb702df406ab4cf73fca24d3d2, type: 3}
       propertyPath: m_LocalPosition.z
@@ -1069,8 +1069,8 @@ Rigidbody:
   m_GameObject: {fileID: 507114826}
   serializedVersion: 5
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_LinearDamping: 5
+  m_AngularDamping: 5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -1082,7 +1082,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -1614,7 +1614,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -2223,8 +2223,8 @@ Rigidbody:
   m_GameObject: {fileID: 626176026}
   serializedVersion: 5
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
+  m_LinearDamping: 5
+  m_AngularDamping: 5
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -2236,7 +2236,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
@@ -2724,6 +2724,11 @@ MonoBehaviour:
   installationRoutineCheckpoint:
     _installationRoutineId: 
     _installationVariants: []
+--- !u!1 &777633734 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2975419808855155294, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+  m_PrefabInstance: {fileID: 8759344034395200921}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &821126676
 GameObject:
   m_ObjectHideFlags: 0
@@ -3242,7 +3247,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -3415,7 +3420,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -3588,7 +3593,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -4445,7 +4450,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -4838,7 +4843,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -5933,7 +5938,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -6186,7 +6191,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -6359,7 +6364,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -8535,7 +8540,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -8708,7 +8713,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseHits: 3
   hitsPerLevel: 05000000040000000200000001000000
-  ironOrePrefab: {fileID: 0}
+  ironOrePrefab: {fileID: 777633734}
   oreDropCount: 1
   hitParticles: {fileID: 0}
   hitSound: {fileID: 0}
@@ -9169,6 +9174,71 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScreenShake
   target: {fileID: 0}
+--- !u!1 &2031926389
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2031926391}
+  - component: {fileID: 2031926390}
+  m_Layer: 0
+  m_Name: ArchaeologyGameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2031926390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031926389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9af1446f876946ceb117ef16b7b7f3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ArchaeologyGameManager
+  oreCount: 0
+  upgradeLevel: 0
+  totalRockFragments: 0
+  destroyedFragments: 0
+  statueObject: {fileID: 919132149155446097, guid: 90444faba421d410896339dc4ec69251, type: 3}
+  maxUpgradeLevel: 3
+  baseUpgradeCost: 5
+  upgradeCostIncrement: 5
+  logManager: 1
+  OnOreCountChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpgradeLevelChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnUpgradeFailed:
+    m_PersistentCalls:
+      m_Calls: []
+  OnGameWon:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &2031926391
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2031926389}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2050571672
 GameObject:
   m_ObjectHideFlags: 0
@@ -9450,6 +9520,63 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2137010139}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &8759344034395200921
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 2450239816798353636, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2450239816798353636, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2450239816798353636, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2450239816798353636, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2450239816798353636, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2450239816798353636, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2450239816798353636, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2450239816798353636, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2450239816798353636, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2450239816798353636, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2975419808855155294, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
+      propertyPath: m_Name
+      value: Fluorite
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 46e7d27cf26e94783afaa3dfca281406, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -9468,3 +9595,5 @@ SceneRoots:
   - {fileID: 110098851}
   - {fileID: 1621704416}
   - {fileID: 621756374}
+  - {fileID: 2031926391}
+  - {fileID: 8759344034395200921}

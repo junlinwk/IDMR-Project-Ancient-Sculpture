@@ -47,3 +47,6 @@ Thumbs.db
 # Documentation (keep only README)
 *.md
 !README.md
+
+/[Uu]ser[Ss]ettings/
+IDMR-Project-Ancient-Sculpture.slnx

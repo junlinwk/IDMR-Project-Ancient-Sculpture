@@ -14,6 +14,10 @@ using UnityEngine;
 public class WeakPointCollisionBox : MonoBehaviour
 {
     [Header("Hit Settings")]
+    [Tooltip("Hits required to break the rock through the weak point, per upgrade level. " +
+             "Index 0 = Lv0, 1 = Lv1, etc. If empty, falls back to Hits Before Drop.")]
+    [SerializeField] private int[] hitsPerLevelWeak = new int[] { 3, 2, 1, 1 };
+    [Tooltip("Fallback hit count used when Hits Per Level Weak is empty. Ignored otherwise.")]
     [SerializeField] private int hitsBeforeDrop = 3;
     [SerializeField] private string pickaxeTag = "Pickaxe";
     [Range(0f, 1f)]
@@ -36,8 +40,10 @@ public class WeakPointCollisionBox : MonoBehaviour
     private Renderer[] targetRenderers;
     private FeedbackManager feedback;
     private Transform parentStone;
+    private RockFragment parentRockFragment;
     private int hitCount;
     private bool dropped;
+    private int currentThreshold;
 
     private void Awake()
     {
@@ -45,10 +51,10 @@ public class WeakPointCollisionBox : MonoBehaviour
         weakPointCollider.isTrigger = true;
 
         targetRenderers = GetComponentsInChildren<Renderer>(true);
-        RockFragment rockFragment = GetComponentInParent<RockFragment>();
-        if (rockFragment != null)
+        parentRockFragment = GetComponentInParent<RockFragment>();
+        if (parentRockFragment != null)
         {
-            parentStone = rockFragment.transform;
+            parentStone = parentRockFragment.transform;
         }
         else if (transform.parent != null)
         {
@@ -59,11 +65,44 @@ public class WeakPointCollisionBox : MonoBehaviour
             parentStone = transform;
         }
         feedback = Object.FindFirstObjectByType<FeedbackManager>();
+
+        currentThreshold = GetWeakHitsForLevel(0);
     }
 
     private void Start()
     {
+        // Subscribe to upgrade events so the weak-point threshold shrinks along
+        // with the pickaxe's power.
+        if (ArchaeologyGameManager.Instance != null)
+        {
+            ArchaeologyGameManager.Instance.OnUpgradeLevelChanged.AddListener(HandleUpgrade);
+            currentThreshold = GetWeakHitsForLevel(ArchaeologyGameManager.Instance.GetUpgradeLevel());
+        }
+
         ApplyStateVisual();
+    }
+
+    private void OnDestroy()
+    {
+        if (ArchaeologyGameManager.Instance != null)
+        {
+            ArchaeologyGameManager.Instance.OnUpgradeLevelChanged.RemoveListener(HandleUpgrade);
+        }
+    }
+
+    private void HandleUpgrade(int level)
+    {
+        currentThreshold = GetWeakHitsForLevel(level);
+    }
+
+    private int GetWeakHitsForLevel(int level)
+    {
+        if (hitsPerLevelWeak != null && hitsPerLevelWeak.Length > 0)
+        {
+            int idx = Mathf.Clamp(level, 0, hitsPerLevelWeak.Length - 1);
+            return Mathf.Max(1, hitsPerLevelWeak[idx]);
+        }
+        return Mathf.Max(1, hitsBeforeDrop);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -97,7 +136,12 @@ public class WeakPointCollisionBox : MonoBehaviour
 
         hitCount++;
 
-        if (hitCount >= hitsBeforeDrop)
+        if (logWeakPointHits)
+        {
+            Debug.Log($"{nameof(WeakPointCollisionBox)} hit count: {hitCount}/{currentThreshold} on {gameObject.name}.");
+        }
+
+        if (hitCount >= currentThreshold)
         {
             DropStone();
             return;
@@ -184,20 +228,31 @@ public class WeakPointCollisionBox : MonoBehaviour
     private void DropStone()
     {
         dropped = true;
+        weakPointCollider.enabled = false;
 
         if (logWeakPointHits)
         {
-            Debug.Log($"{nameof(WeakPointCollisionBox)} dropping stone on {gameObject.name}.");
+            Debug.Log($"{nameof(WeakPointCollisionBox)} threshold reached on {gameObject.name}. Routing to RockFragment.");
         }
 
+        // Preferred path: delegate to RockFragment so the rock goes through the
+        // shared destruction pipeline — ore spawn, upgrade counter, manager
+        // notification. This unifies the weak-point route with the regular
+        // body-hit route.
+        if (parentRockFragment != null)
+        {
+            parentRockFragment.TriggerDestruction();
+            return;
+        }
+
+        // Fallback (no RockFragment on parent): keep the legacy fall-and-land
+        // animation so at least the stone visibly drops.
         if (feedback != null)
         {
             feedback.PlayRockDropFeedback(transform.position);
         }
 
         EnsureLandingFeedback();
-
-        weakPointCollider.enabled = false;
 
         if (hideParentRenderersOnDrop && targetRenderers != null)
         {

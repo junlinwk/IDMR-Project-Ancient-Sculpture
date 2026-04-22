@@ -9,9 +9,15 @@ public class RockFragment : MonoBehaviour
              "If set, overrides Base Hits entirely. Levels beyond the array length use the last value.")]
     [SerializeField] private int[] hitsPerLevel = new int[] { 5, 4, 2, 1 };
     [SerializeField] private GameObject ironOrePrefab;
-    [SerializeField] private int oreDropCount = 1;
-    [Tooltip("Initial scatter speed applied to spawned ore. Lower values keep ore close to the rock.")]
+    [SerializeField] private int oreDropCount = 3;
+    [Tooltip("Horizontal scatter speed. Higher = ores fly further apart from each other.")]
     [SerializeField] private float oreScatterSpeed = 1.2f;
+    [Tooltip("Vertical offset above the rock where ore is spawned.")]
+    [SerializeField] private float oreSpawnHeightOffset = 2.0f;
+    [Tooltip("Upward burst velocity added on spawn. Small positive value helps each ore arc visibly outward.")]
+    [SerializeField] private float oreUpwardBurst = 1.5f;
+    [Tooltip("Random radius (metres) around the spawn point so multiple ores don't stack on top of each other.")]
+    [SerializeField] private float oreSpawnJitter = 0.15f;
 
     [Header("Visual Feedback")]
     [SerializeField] private ParticleSystem hitParticles;
@@ -144,6 +150,21 @@ public class RockFragment : MonoBehaviour
         return Mathf.Max(1, baseHits - level);
     }
 
+    /// <summary>
+    /// Public entry point so other systems (e.g. weak-point colliders) can trigger
+    /// the full destruction sequence — ore spawn, debris, manager notification,
+    /// and GameObject removal — without re-implementing the logic.
+    /// </summary>
+    public void TriggerDestruction()
+    {
+        if (_positionLocked == false)
+        {
+            // Already in the destruction sequence; avoid double-invoking.
+            return;
+        }
+        Destroy();
+    }
+
     private void Destroy()
     {
         // Release the position lock so anything in the destruction sequence
@@ -190,17 +211,40 @@ public class RockFragment : MonoBehaviour
             return;
         }
 
+        Collider[] rockColliders = GetComponentsInChildren<Collider>();
+        Vector3 basePos = transform.position + Vector3.up * oreSpawnHeightOffset;
+
         for (int i = 0; i < oreDropCount; i++)
         {
-            GameObject ore = Instantiate(ironOrePrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+            // Small random horizontal jitter so multiple ores don't spawn stacked.
+            Vector2 jitter2D = Random.insideUnitCircle * oreSpawnJitter;
+            Vector3 spawnPos = basePos + new Vector3(jitter2D.x, 0f, jitter2D.y);
+
+            GameObject ore = Instantiate(ironOrePrefab, spawnPos, Quaternion.identity);
+
+            // Ignore collision between the spawned ore and this rock (or its children)
+            // so the ore doesn't get violently ejected if it spawns inside the rock's collider.
+            Collider[] oreColliders = ore.GetComponentsInChildren<Collider>();
+            foreach (Collider oc in oreColliders)
+            {
+                foreach (Collider rc in rockColliders)
+                {
+                    if (oc != null && rc != null)
+                    {
+                        Physics.IgnoreCollision(oc, rc, true);
+                    }
+                }
+            }
+
             Rigidbody rb = ore.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                // Apply gentle upward-biased scatter so ore lands close to the rock
-                // instead of rocketing into walls / through floor colliders.
-                Vector3 randomDirection = Random.insideUnitSphere;
-                randomDirection.y = Mathf.Abs(randomDirection.y);
-                rb.linearVelocity = randomDirection * oreScatterSpeed;
+                // Each ore gets its own outward direction so they scatter in different
+                // directions instead of all drifting the same way.
+                Vector2 dir2D = Random.insideUnitCircle.normalized;
+                if (dir2D == Vector2.zero) dir2D = Vector2.right;
+                Vector3 lateral = new Vector3(dir2D.x, 0f, dir2D.y);
+                rb.linearVelocity = lateral * oreScatterSpeed + Vector3.up * oreUpwardBurst;
             }
         }
     }

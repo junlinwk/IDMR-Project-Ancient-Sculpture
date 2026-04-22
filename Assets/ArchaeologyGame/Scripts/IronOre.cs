@@ -12,7 +12,7 @@ public class IronOre : MonoBehaviour
     [Tooltip("Grace period (seconds) after spawn during which the ore ignores the " +
              "player and just lies on the ground. Gives the player a chance to see it " +
              "before auto-pickup kicks in.")]
-    [SerializeField] private float pickupDelay = 1.5f;
+    [SerializeField] private float pickupDelay = 4f;
 
     [Header("Safety Net")]
     [Tooltip("If the ore falls below this world Y, teleport it near the player (catches ore that falls through the floor).")]
@@ -37,8 +37,29 @@ public class IronOre : MonoBehaviour
         {
             rb = gameObject.AddComponent<Rigidbody>();
         }
-        // Continuous detection avoids tunneling through thin floor colliders on spawn.
+        // Force physics settings so the ore actually falls and bounces regardless
+        // of how the prefab was configured in the editor.
+        rb.useGravity = true;
+        rb.isKinematic = false;
+        rb.linearDamping = 1f;   // air resistance so it stops rolling eventually
+        rb.angularDamping = 1f;
         rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        // Warn if there is no Collider — without one the ore will fall through
+        // the floor forever.
+        Collider col = GetComponent<Collider>();
+        if (col == null)
+        {
+            col = GetComponentInChildren<Collider>();
+        }
+        if (col == null && logPickup)
+        {
+            Debug.LogError("[IronOre] No Collider on prefab! Ore will fall through the floor. Add a SphereCollider (Is Trigger = false).");
+        }
+        else if (col != null && col.isTrigger && logPickup)
+        {
+            Debug.LogWarning("[IronOre] Collider is set as Is Trigger. Ore will pass through floor and won't rest visibly. Set Is Trigger = false for proper landing.");
+        }
 
         spawnTime = Time.time;
 

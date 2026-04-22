@@ -794,6 +794,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -1659,7 +1660,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7d06ab75618e0405989ff25f245766f8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.33
+      value: -1.779
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7d06ab75618e0405989ff25f245766f8, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2288,6 +2289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -5704,6 +5706,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -6037,6 +6040,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -6855,6 +6859,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -7347,6 +7352,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -7793,6 +7799,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -7964,7 +7971,7 @@ Transform:
   m_GameObject: {fileID: 1714126125}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -16.37, y: -1.69, z: -0.36}
+  m_LocalPosition: {x: -16.37, y: -1.56, z: -0.36}
   m_LocalScale: {x: 5.225, y: 12.821628, z: 5.225}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8457,6 +8464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -8594,6 +8602,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -8731,6 +8740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -9468,6 +9478,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1
@@ -10009,6 +10020,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dedeac9cd3dc44f4fbdd98393d0f04d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeakPointCollisionBox
+  hitsPerLevelWeak: 03000000020000000100000001000000
   hitsBeforeDrop: 3
   pickaxeTag: Pickaxe
   hitSuccessChance: 1

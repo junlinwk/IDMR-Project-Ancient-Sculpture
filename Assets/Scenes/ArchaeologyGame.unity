@@ -1024,6 +1024,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Hammer
   hammerHapticAmplitude: 0.5
   hammerHapticDuration: 0.1
+  logHammer: 1
 --- !u!114 &507114828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2218,7 +2219,7 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -2238,7 +2239,8 @@ MonoBehaviour:
   m_snapPosition: 0
   m_snapOrientation: 0
   m_snapOffset: {fileID: 0}
-  m_grabPoints: []
+  m_grabPoints:
+  - {fileID: 626176027}
 --- !u!114 &626176031
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2254,6 +2256,8 @@ MonoBehaviour:
   pickaxeHapticAmplitude: 0.7
   pickaxeHapticDuration: 0.15
   logPickaxeHits: 1
+  logGrabDiagnostic: 0
+  grabDiagIntervalFrames: 30
 --- !u!1 &654338953
 GameObject:
   m_ObjectHideFlags: 0
@@ -3758,6 +3762,7 @@ MonoBehaviour:
   failSound: {fileID: 0}
   hitParticles: {fileID: 0}
   upgradeParticles: {fileID: 0}
+  logAnvil: 1
 --- !u!1 &941164886 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 90444faba421d410896339dc4ec69251, type: 3}
@@ -7114,7 +7119,7 @@ RectTransform:
   m_GameObject: {fileID: 1621704411}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1921581018}

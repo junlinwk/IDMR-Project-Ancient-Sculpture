@@ -3,7 +3,11 @@ using UnityEngine;
 public class RockFragment : MonoBehaviour
 {
     [Header("Hit Settings")]
+    [Tooltip("Fallback hits when Hits Per Level is empty. Reduces linearly by upgrade level.")]
     [SerializeField] private int baseHits = 3;
+    [Tooltip("Hits required at each upgrade level. Index 0 = Lv0, 1 = Lv1, etc. " +
+             "If set, overrides Base Hits entirely. Levels beyond the array length use the last value.")]
+    [SerializeField] private int[] hitsPerLevel = new int[] { 5, 4, 2, 1 };
     [SerializeField] private GameObject ironOrePrefab;
     [SerializeField] private int oreDropCount = 1;
 
@@ -38,7 +42,7 @@ public class RockFragment : MonoBehaviour
     public void Initialize(ArchaeologyGameManager manager)
     {
         gameManager = manager;
-        currentHits = baseHits;
+        currentHits = GetHitsForLevel(0);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -83,8 +87,18 @@ public class RockFragment : MonoBehaviour
 
     public void OnUpgrade(int upgradeLevel)
     {
-        // Each upgrade reduces hits needed by 1, minimum 1
-        currentHits = Mathf.Max(1, baseHits - upgradeLevel);
+        currentHits = GetHitsForLevel(upgradeLevel);
+    }
+
+    private int GetHitsForLevel(int level)
+    {
+        if (hitsPerLevel != null && hitsPerLevel.Length > 0)
+        {
+            int idx = Mathf.Clamp(level, 0, hitsPerLevel.Length - 1);
+            return Mathf.Max(1, hitsPerLevel[idx]);
+        }
+        // Fallback: linear reduction from baseHits
+        return Mathf.Max(1, baseHits - level);
     }
 
     private void Destroy()

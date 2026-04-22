@@ -45,8 +45,5 @@ Thumbs.db
 *.pem
 
 # Documentation (keep only README)
-TUTORIAL_ZH.md
-PROJECT_STRUCTURE.md
-COMPLETION_CHECKLIST.md
-GET_STARTED.md
-INDEX.md
+*.md
+!README.md

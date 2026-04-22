@@ -33,7 +33,14 @@ public class RockFragment : MonoBehaviour
         if (rb != null)
         {
             // Keep rock fragments in place until they are explicitly hit or destroyed.
+            // FreezeAll constraints prevent overlapping fragments from shoving each
+            // other apart on scene start, while keeping the Rigidbody dynamic so that
+            // OnCollisionEnter still fires when a Kinematic pickaxe (held via
+            // OVRGrabbable) strikes the rock. Kinematic-vs-Kinematic collisions would
+            // be silently dropped.
             rb.useGravity = false;
+            rb.isKinematic = false;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
         }
 
         feedback = Object.FindFirstObjectByType<FeedbackManager>();

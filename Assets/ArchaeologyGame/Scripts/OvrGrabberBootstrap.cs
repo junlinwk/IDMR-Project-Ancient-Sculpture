@@ -7,7 +7,10 @@ using UnityEngine;
 /// </summary>
 public static class OvrGrabberBootstrap
 {
-    private const float GrabVolumeRadius = 0.12f;
+    // Radius of the sphere that detects grabbable objects near the controller.
+    // 0.12 is the OVR default (tight). 0.25 is more forgiving for XR simulator
+    // users who have to aim with WASD + mouse instead of a real tracked hand.
+    private const float GrabVolumeRadius = 0.25f;
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     private static void ConfigureGrabbers()

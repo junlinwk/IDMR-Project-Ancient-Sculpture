@@ -28,23 +28,9 @@ public class AnvilStation : MonoBehaviour
 
     private int hammerHits = 0;
 
-    private void Start()
-    {
-        // Ensure this object is tagged for detection. Wrap in try/catch because
-        // the tag may not be defined in ProjectSettings/TagManager.asset, which
-        // would otherwise throw and halt the rest of Start().
-        try
-        {
-            gameObject.tag = "AnvilStation";
-        }
-        catch (UnityException)
-        {
-            Debug.LogError(
-                "[AnvilStation] Tag 'AnvilStation' is not defined in ProjectSettings/TagManager. " +
-                "Add it via Edit > Project Settings > Tags and Layers. " +
-                "Hammer detection still works via GetComponent<AnvilStation>() so this is not fatal.");
-        }
-    }
+    // No Start() tag-setting needed. Hammer.cs detects this station via
+    // GetComponent<AnvilStation>() / GetComponentInParent<AnvilStation>(),
+    // so we never rely on the "AnvilStation" tag.
 
     public void Hit()
     {

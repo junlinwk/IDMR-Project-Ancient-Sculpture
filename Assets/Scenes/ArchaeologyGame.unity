@@ -1041,6 +1041,8 @@ MonoBehaviour:
   hammerHapticAmplitude: 0.5
   hammerHapticDuration: 0.1
   logHammer: 1
+  logGrabDiagnostic: 0
+  grabDiagIntervalFrames: 30
 --- !u!114 &507114828
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4532,6 +4534,10 @@ PrefabInstance:
       propertyPath: _centerEyeCamera
       value: 
       objectReference: {fileID: 1139396502}
+    - target: {fileID: 3903482225804038118, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
+      propertyPath: m_ExcludeLayers.m_Bits
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 4148778239110795873, guid: 0a7d2469f24041c4284c66706f84c45e, type: 3}
       propertyPath: m_Name
       value: '[BuildingBlock] OVRInteractionComprehensive'

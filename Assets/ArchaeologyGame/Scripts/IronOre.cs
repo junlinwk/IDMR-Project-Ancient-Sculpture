@@ -10,12 +10,20 @@ public class IronOre : MonoBehaviour
     [SerializeField] private float pickupRange = 1.0f;
     [SerializeField] private float moveSpeed = 10f;
 
+    [Header("Safety Net")]
+    [Tooltip("If the ore falls below this world Y, teleport it near the player (catches ore that falls through the floor).")]
+    [SerializeField] private float fallThreshold = -3f;
+    [Tooltip("If the ore still exists after this many seconds, force-home it to the player regardless of distance.")]
+    [SerializeField] private float rescueAfterSeconds = 8f;
+
     [Header("Debug")]
     [SerializeField] private bool logPickup = true;
 
     private Transform playerTarget;
     private bool isBeingPickedUp = false;
     private bool hasEnteredPickupRange = false;
+    private bool isBeingRescued = false;
+    private float spawnTime;
     private Rigidbody rb;
 
     private void Start()
@@ -25,6 +33,10 @@ public class IronOre : MonoBehaviour
         {
             rb = gameObject.AddComponent<Rigidbody>();
         }
+        // Continuous detection avoids tunneling through thin floor colliders on spawn.
+        rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+        spawnTime = Time.time;
 
         // Find the player's camera rig
         OVRCameraRig cameraRig = FindObjectOfType<OVRCameraRig>();
@@ -57,11 +69,28 @@ public class IronOre : MonoBehaviour
 
     private void Update()
     {
-        // If player exists and ore is within pickup range, move toward player
-        if (playerTarget != null && !isBeingPickedUp)
+        if (isBeingPickedUp || playerTarget == null)
+        {
+            return;
+        }
+
+        // Safety nets: fell through the world, or been sitting around too long
+        // unreachable. Force-home to the player so it doesn't get lost.
+        if (!isBeingRescued &&
+            (transform.position.y < fallThreshold ||
+             Time.time - spawnTime > rescueAfterSeconds))
+        {
+            isBeingRescued = true;
+            hasEnteredPickupRange = true; // also kicks in homing behavior below
+            if (logPickup)
+            {
+                Debug.Log($"[IronOre] RESCUE triggered (y={transform.position.y:F2}, age={Time.time - spawnTime:F1}s). Forcing to player.");
+            }
+        }
+
         {
             float distance = Vector3.Distance(transform.position, playerTarget.position);
-            if (distance < pickupRange)
+            if (distance < pickupRange || isBeingRescued)
             {
                 if (logPickup && !hasEnteredPickupRange)
                 {

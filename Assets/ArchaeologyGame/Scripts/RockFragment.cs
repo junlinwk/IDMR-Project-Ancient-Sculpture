@@ -10,6 +10,8 @@ public class RockFragment : MonoBehaviour
     [SerializeField] private int[] hitsPerLevel = new int[] { 5, 4, 2, 1 };
     [SerializeField] private GameObject ironOrePrefab;
     [SerializeField] private int oreDropCount = 1;
+    [Tooltip("Initial scatter speed applied to spawned ore. Lower values keep ore close to the rock.")]
+    [SerializeField] private float oreScatterSpeed = 1.2f;
 
     [Header("Visual Feedback")]
     [SerializeField] private ParticleSystem hitParticles;
@@ -156,10 +158,11 @@ public class RockFragment : MonoBehaviour
             Rigidbody rb = ore.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                // Apply random force to scatter ore
+                // Apply gentle upward-biased scatter so ore lands close to the rock
+                // instead of rocketing into walls / through floor colliders.
                 Vector3 randomDirection = Random.insideUnitSphere;
-                randomDirection.y = Mathf.Abs(randomDirection.y); // Always upward component
-                rb.linearVelocity = randomDirection * 3f;
+                randomDirection.y = Mathf.Abs(randomDirection.y);
+                rb.linearVelocity = randomDirection * oreScatterSpeed;
             }
         }
     }

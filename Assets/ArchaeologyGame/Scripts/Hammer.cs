@@ -3,6 +3,10 @@ using UnityEngine;
 /// <summary>
 /// Hammer tool controller.
 /// Extends WeaponBase to handle grab detection and interaction with AnvilStation.
+///
+/// Uses velocity+proximity detection instead of OnCollisionEnter because
+/// OVRGrabbable makes the Rigidbody kinematic while held, and Unity does not
+/// fire OnCollisionEnter for kinematic vs. static collider pairs.
 /// </summary>
 public class Hammer : WeaponBase
 {
@@ -10,82 +14,67 @@ public class Hammer : WeaponBase
     [SerializeField] private float hammerHapticAmplitude = 0.5f;
     [SerializeField] private float hammerHapticDuration = 0.1f;
 
+    [Tooltip("Max distance from anvil centre for a strike to register (metres). " +
+             "Increase if the hammerhead model is large or offset.")]
+    [SerializeField] private float strikeRadius = 0.25f;
+
+    [Tooltip("Minimum hand speed (m/s) required to count as a deliberate strike. " +
+             "Prevents slow contact from registering.")]
+    [SerializeField] private float minStrikeSpeed = 1.0f;
+
+    [Tooltip("Cooldown between consecutive anvil hits to prevent rapid multi-trigger.")]
+    [SerializeField] private float strikeCooldown = 0.4f;
+
     [Header("Debug")]
     [SerializeField] private bool logHammer = true;
-    [Tooltip("When enabled, prints a detailed grab-state snapshot every Nth frame. " +
-             "Useful for diagnosing instant-release issues.")]
-    [SerializeField] private bool logGrabDiagnostic = false;
-    [SerializeField] private int grabDiagIntervalFrames = 30;
 
+    private AnvilStation _cachedAnvil;
+    private Vector3 _prevPos;
+    private float _currentSpeed;
+    private float _lastStrikeTime = -999f;
     private bool wasHeldLastFrame = false;
-    private int grabDiagCounter = 0;
 
     protected override void Start()
     {
         base.Start();
-        // Ensure this object is tagged as "Hammer" for detection.
         TrySetTag("Hammer");
+        _cachedAnvil = Object.FindFirstObjectByType<AnvilStation>();
+        if (_cachedAnvil == null)
+            Debug.LogWarning("[Hammer] No AnvilStation found in scene.");
+        _prevPos = transform.position;
     }
 
     private void Update()
     {
-        // Log grab state transitions so we can spot simulator / dual-hand issues.
+        // Track hand speed every frame regardless of held state.
+        _currentSpeed = (transform.position - _prevPos).magnitude / Time.deltaTime;
+        _prevPos = transform.position;
+
+        // Log grab state transitions.
         if (logHammer && IsHeld != wasHeldLastFrame)
         {
             string grabberName = (grabbable != null && grabbable.grabbedBy != null)
-                ? grabbable.grabbedBy.gameObject.name
-                : "(none)";
+                ? grabbable.grabbedBy.gameObject.name : "(none)";
             float gripL = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
             float gripR = OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger);
-            Rigidbody rb = GetComponent<Rigidbody>();
-            string rbInfo = rb != null
-                ? $"kinematic={rb.isKinematic}, gravity={rb.useGravity}, mass={rb.mass}"
-                : "no Rigidbody";
             Debug.Log($"[Hammer] IsHeld {wasHeldLastFrame} -> {IsHeld} (frame {Time.frameCount}). " +
-                      $"grabbedBy={grabberName}, controller={GetHoldingController()}, " +
-                      $"gripL={gripL:F2}, gripR={gripR:F2}, {rbInfo}");
+                      $"grabbedBy={grabberName}, gripL={gripL:F2}, gripR={gripR:F2}");
             wasHeldLastFrame = IsHeld;
         }
 
-        // Optional periodic snapshot to detect sub-frame flicker.
-        if (logGrabDiagnostic)
-        {
-            grabDiagCounter++;
-            if (grabDiagCounter >= grabDiagIntervalFrames)
-            {
-                grabDiagCounter = 0;
-                float gripL = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
-                float gripR = OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger);
-                Debug.Log($"[Hammer DIAG] IsHeld={IsHeld}, gripL={gripL:F2}, gripR={gripR:F2}, pos={transform.position:F2}");
-            }
-        }
-    }
+        if (!IsHeld) return;
+        if (_cachedAnvil == null) return;
+        if (Time.time - _lastStrikeTime < strikeCooldown) return;
 
-    private void OnCollisionEnter(Collision collision)
-    {
+        float dist = Vector3.Distance(transform.position, _cachedAnvil.transform.position);
+        if (dist > strikeRadius) return;
+        if (_currentSpeed < minStrikeSpeed) return;
+
         if (logHammer)
-        {
-            Debug.Log($"[Hammer] Collision with '{collision.gameObject.name}' (IsHeld={IsHeld})");
-        }
+            Debug.Log($"[Hammer] Strike detected — dist={dist:F3}m, speed={_currentSpeed:F2}m/s — calling anvil.Hit()");
 
-        // Check if striking the anvil station
-        AnvilStation anvil = collision.gameObject.GetComponent<AnvilStation>();
-        if (anvil == null)
-        {
-            anvil = collision.gameObject.GetComponentInParent<AnvilStation>();
-        }
-
-        if (anvil != null && IsHeld)
-        {
-            if (logHammer) Debug.Log($"[Hammer] Hit AnvilStation — calling anvil.Hit()");
-            anvil.Hit();
-
-            // Haptic feedback on anvil strike
-            TriggerHaptic(hammerHapticAmplitude, hammerHapticDuration);
-        }
-        else if (anvil != null && !IsHeld && logHammer)
-        {
-            Debug.Log($"[Hammer] Touched AnvilStation but NOT HELD — ignoring.");
-        }
+        _lastStrikeTime = Time.time;
+        _cachedAnvil.Hit();
+        TriggerHaptic(hammerHapticAmplitude, hammerHapticDuration);
     }
 }

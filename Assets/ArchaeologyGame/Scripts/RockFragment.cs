@@ -28,6 +28,9 @@ public class RockFragment : MonoBehaviour
     private ArchaeologyGameManager gameManager;
     private FeedbackManager feedback;
     private Rigidbody rb;
+    private Vector3 _lockedPosition;
+    private Quaternion _lockedRotation;
+    private bool _positionLocked = false;
 
     private void Awake()
     {
@@ -45,7 +48,38 @@ public class RockFragment : MonoBehaviour
             rb.constraints = RigidbodyConstraints.FreezeAll;
         }
 
+        // Capture the spawn pose as the immutable anchor. LateUpdate will force-clamp
+        // the transform back here every frame regardless of what physics does.
+        _lockedPosition = transform.position;
+        _lockedRotation = transform.rotation;
+        _positionLocked = true;
+
         feedback = Object.FindFirstObjectByType<FeedbackManager>();
+    }
+
+    private void LateUpdate()
+    {
+        // Hard-lock position/rotation so nothing (not even forces that bypass
+        // FreezeAll) can displace the rock until it is destroyed via Hit().
+        if (_positionLocked)
+        {
+            if (transform.position != _lockedPosition)
+            {
+                transform.position = _lockedPosition;
+                if (rb != null)
+                {
+                    rb.linearVelocity = Vector3.zero;
+                }
+            }
+            if (transform.rotation != _lockedRotation)
+            {
+                transform.rotation = _lockedRotation;
+                if (rb != null)
+                {
+                    rb.angularVelocity = Vector3.zero;
+                }
+            }
+        }
     }
 
     public void Initialize(ArchaeologyGameManager manager)
@@ -112,6 +146,10 @@ public class RockFragment : MonoBehaviour
 
     private void Destroy()
     {
+        // Release the position lock so anything in the destruction sequence
+        // (particles, debris) can behave naturally.
+        _positionLocked = false;
+
         if (logRockHits)
         {
             Debug.Log($"{nameof(RockFragment)} destroyed on {gameObject.name}.");

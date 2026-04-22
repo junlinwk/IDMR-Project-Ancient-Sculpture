@@ -9,6 +9,10 @@ public class IronOre : MonoBehaviour
     [Header("Pickup Settings")]
     [SerializeField] private float pickupRange = 1.0f;
     [SerializeField] private float moveSpeed = 10f;
+    [Tooltip("Grace period (seconds) after spawn during which the ore ignores the " +
+             "player and just lies on the ground. Gives the player a chance to see it " +
+             "before auto-pickup kicks in.")]
+    [SerializeField] private float pickupDelay = 1.5f;
 
     [Header("Safety Net")]
     [Tooltip("If the ore falls below this world Y, teleport it near the player (catches ore that falls through the floor).")]
@@ -59,6 +63,12 @@ public class IronOre : MonoBehaviour
         // Direct collision with player trigger
         if (collision.CompareTag("Player"))
         {
+            // Respect the grace period so the player has a chance to see the ore
+            // before it snaps into them.
+            if (Time.time - spawnTime < pickupDelay)
+            {
+                return;
+            }
             if (logPickup)
             {
                 Debug.Log($"[IronOre] Triggered by Player collider '{collision.name}' — picking up.");
@@ -70,6 +80,13 @@ public class IronOre : MonoBehaviour
     private void Update()
     {
         if (isBeingPickedUp || playerTarget == null)
+        {
+            return;
+        }
+
+        // During the grace period the ore just sits there (scatter physics still
+        // applies via Rigidbody). Don't home, don't auto-pickup.
+        if (Time.time - spawnTime < pickupDelay)
         {
             return;
         }

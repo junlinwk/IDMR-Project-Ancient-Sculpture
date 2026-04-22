@@ -11,8 +11,13 @@ public class Pickaxe : WeaponBase
     [SerializeField] private float pickaxeHapticAmplitude = 0.7f;
     [SerializeField] private float pickaxeHapticDuration = 0.15f;
     [SerializeField] private bool logPickaxeHits = true;
+    [Tooltip("When enabled, prints a detailed grab-state snapshot every Nth frame " +
+             "(see Grab Diag Interval). Useful for diagnosing instant-release issues.")]
+    [SerializeField] private bool logGrabDiagnostic = false;
+    [SerializeField] private int grabDiagIntervalFrames = 30;
 
     private bool wasHeldLastFrame = false;
+    private int grabDiagCounter = 0;
 
     protected override void Start()
     {
@@ -29,8 +34,29 @@ public class Pickaxe : WeaponBase
             string grabberName = (grabbable != null && grabbable.grabbedBy != null)
                 ? grabbable.grabbedBy.gameObject.name
                 : "(none)";
-            Debug.Log($"[Pickaxe] IsHeld {wasHeldLastFrame} -> {IsHeld}. grabbedBy={grabberName}, controller={GetHoldingController()}");
+            float gripL = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
+            float gripR = OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger);
+            Rigidbody rb = GetComponent<Rigidbody>();
+            string rbInfo = rb != null
+                ? $"kinematic={rb.isKinematic}, gravity={rb.useGravity}, mass={rb.mass}"
+                : "no Rigidbody";
+            Debug.Log($"[Pickaxe] IsHeld {wasHeldLastFrame} -> {IsHeld} (frame {Time.frameCount}). " +
+                      $"grabbedBy={grabberName}, controller={GetHoldingController()}, " +
+                      $"gripL={gripL:F2}, gripR={gripR:F2}, {rbInfo}");
             wasHeldLastFrame = IsHeld;
+        }
+
+        // Optional periodic snapshot to detect sub-frame flicker.
+        if (logGrabDiagnostic)
+        {
+            grabDiagCounter++;
+            if (grabDiagCounter >= grabDiagIntervalFrames)
+            {
+                grabDiagCounter = 0;
+                float gripL = OVRInput.Get(OVRInput.Axis1D.PrimaryHandTrigger);
+                float gripR = OVRInput.Get(OVRInput.Axis1D.SecondaryHandTrigger);
+                Debug.Log($"[Pickaxe DIAG] IsHeld={IsHeld}, gripL={gripL:F2}, gripR={gripR:F2}, pos={transform.position:F2}");
+            }
         }
     }
 

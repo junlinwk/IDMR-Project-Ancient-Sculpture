@@ -7,9 +7,9 @@
 ![Unity 6000.0.53f1](https://img.shields.io/badge/Unity-6000.0.53f1-lightgrey?logo=unity)
 ![Meta XR SDK](https://img.shields.io/badge/Meta%20XR%20SDK-85.0.0-000000?logo=meta)
 ![License MIT](https://img.shields.io/badge/License-MIT-green)
-![Version 0.1.0](https://img.shields.io/badge/Version-0.1.0--alpha-blue)
+![Version 0.2.0](https://img.shields.io/badge/Version-0.2.0--alpha-blue)
 
-**Meta Quest 3 VR 考古遊戲原型**  
+**Meta Quest 3 VR 考古遊戲原型**
 *使用 Apple LiDAR 掃描環境，沉浸式挖掘體驗*
 
 ---
@@ -18,312 +18,284 @@
 
 ## 📋 專案概述
 
-本專案是一個完全可運行的 **Meta Quest 3 VR 遊戲**，已完成所有場景建立、物件配置和功能集成。玩家可以：
+Meta Quest 3 VR 考古遊戲。玩家在沉浸式 MR 場景中：
 
-1. **🔨 敲擊石頭** — 使用鐵鎬敲碎包裹著雕像的石頭外殼
-2. **⛏️ 收集鐵礦** — 敲碎石頭時掉落的鐵礦自動吸附並被收集
-3. **⬆️ 升級工具** — 在工作台用錘子敲擊升級鐵鎬，減少敲擊次數
-4. **🏆 挖出雕像** — 摧毀所有石頭碎片後揭露雕像，遊戲完成
+1. **🔨 敲擊石頭** — 用鐵鎬敲碎包裹雕像的石頭外殼。每顆石頭有兩條擊破路徑：
+   - **石頭本體** — 需要多下敲擊
+   - **弱點（高亮子物件）** — 較少敲擊即可破
+2. **⛏️ 收集鐵礦** — 敲碎石頭掉落鐵礦，噴散落地，短暫靜置後自動吸附拾取
+3. **⬆️ 升級鐵鎬** — 在鐵砧前以鐵鎚敲打，**消耗鐵礦**升級工具，減少敲擊次數
+4. **🏆 挖出雕像** — 摧毀所有石頭後揭露 Gauss 雕像
 
-**環境資源：** 真實 Apple LiDAR 掃描模型（Gauss 雕像 + 周圍環境）
+**環境資源：** Apple LiDAR 掃描模型（Gauss 雕像 + 周圍環境）
 
 ---
 
 ## ✨ 功能完成度
 
-| 功能 | 狀態 | 說明 |
+| 系統 | 狀態 | 說明 |
 |------|:----:|------|
-| 遊戲邏輯系統 | ✅ | 7 個核心腳本，完全實現 |
-| 工具抓取系統 | ✅ | Meta Interaction SDK 集成 |
-| 碎片破壞系統 | ✅ | 敲擊計數、自動銷毀 |
-| 礦物收集系統 | ✅ | 自動吸附、計數累積 |
-| 升級機制 | ✅ | 難度動態調整 |
-| HUD 顯示 | ✅ | 實時礦數與升級等級 |
-| 手柄反饋 | ✅ | Haptics 振動 |
-| 場景配置 | ✅ | 完整場景文件 |
-| 掃描模型 | ✅ | Gauss + 環境已整合 |
+| 工具抓取（OVRGrabbable） | ✅ | 雙手支援、Grip 鍵控制 |
+| 鐵鎬敲擊本體 | ✅ | 每級敲擊次數可設 |
+| 弱點敲擊系統 | ✅ | 可視化變色、升級同步 |
+| 鐵礦掉落 + 散射 | ✅ | 散落範圍、高度、速度可調 |
+| 鐵礦自動拾取 | ✅ | 距離閾值 + 寬容期 |
+| 掉落防呆（Rescue） | ✅ | 掉出世界 / 卡住自動召回玩家 |
+| 鐵礦付費升級 | ✅ | 費用遞增、HUD 顯示剩餘需求 |
+| 升級失敗回饋 | ✅ | 音效 + HUD 紅字閃爍 |
+| 鐵鎚 Anvil 打擊 | ✅ | 速度+距離判定（繞過 Kinematic 限制）|
+| HUD 顯示 | ✅ | 世界空間 UI，跟隨玩家頭部 |
+| 手柄震動 | ✅ | Haptics |
+| Layer 碰撞隔離 | ✅ | Tools vs PlayerController 分離 |
+| 掉物理穩定（位置鎖） | ✅ | LateUpdate 強制回位 |
+| Debug log 開關 | ✅ | 每個系統各自可切換 |
 
 ---
 
 ## 📁 專案結構
 
 ```
-Mid/
+IDMR-Project-Ancient-Sculpture/
 ├── Assets/
 │   ├── ArchaeologyGame/
-│   │   ├── Scripts/                   ← 7 個遊戲腳本（本文檔下方詳述）
-│   │   ├── Materials/                 ← 石頭、礦物材質
-│   │   ├── Prefabs/                   ← IronOre、粒子效果 prefabs
-│   │   └── Audio/                     ← 敲擊、升級、勝利音效
+│   │   └── Scripts/                    ← 18 個遊戲腳本（見下方清單）
 │   ├── Scenes/
-│   │   └── ArchaeologyGame.unity      ← 主遊戲場景（已配置）
+│   │   └── ArchaeologyGame.unity       ← 主遊戲場景
+│   ├── Prefabs/
+│   │   ├── Fluorite.prefab             ← 鐵礦 Prefab（IronOre.cs）
+│   │   ├── broke.wav / dig.wav         ← 音效
+│   │   └── IDMR_midterm_intro.mp4      ← 片頭影片
+│   ├── Materials/
+│   │   └── Ironore.mat                 ← 鐵礦材質
 │   ├── Models/
-│   │   ├── Gauss/                     ← 雕像 (5.3MB)
-│   │   └── 3_18_2026/                 ← 環境掃描 (16MB)
-│   ├── Oculus/                        ← Meta SDK 配置
-│   ├── Resources/                     ← 運行時設定
-│   └── Settings/                      ← 品質設定
-├── ProjectSettings/                   ← Unity 專案配置
-├── Packages/                          ← Meta XR SDK 85.0.0
-└── 文檔/
-    ├── README.md (本檔案)
-    ├── TUTORIAL_ZH.md                 ← 新手逐步教學
-    ├── GET_STARTED.md                 ← 快速開始
-    ├── PROJECT_STRUCTURE.md           ← 結構與協作
-    ├── COMPLETION_CHECKLIST.md        ← 進度追蹤
-    └── INDEX.md                       ← 文檔導航
+│   │   ├── Gauss/                      ← 雕像（LiDAR 掃描）
+│   │   ├── 3_18_2026/                  ← 環境掃描
+│   │   ├── Fluorite/                   ← 螢石模型（鐵礦視覺）
+│   │   ├── hammer/                     ← 鐵鎚
+│   │   ├── old-pickaxe/                ← 鐵鎬
+│   │   ├── rock/                       ← 石頭
+│   │   └── dirty-stones-pile/          ← 石堆
+│   ├── Oculus/                         ← Meta SDK 配置
+│   └── Settings/                       ← 品質、渲染設定
+├── ProjectSettings/
+├── Packages/                           ← Meta XR SDK 85.0.0
+├── README.md                           ← 本檔案
+└── UPGRADE_SYSTEM_SETUP.md             ← 升級系統 Inspector 設定指南
 ```
 
 ---
 
-## 🔧 核心腳本詳解
+## 🔧 核心腳本清單
 
-### 1. ArchaeologyGameManager.cs
-**全局遊戲管理器 — 中央控制系統**
+總共 18 個 C# 腳本，按系統分組：
 
-**職責：**
-- 礦物計數管理
-- 升級等級追蹤
-- 勝利條件判定
-- 事件系統協調
+### 🎮 核心遊戲系統
+| 腳本 | 職責 |
+|------|------|
+| `ArchaeologyGameManager.cs` | 中央管理器：礦數、升級等級、鐵礦經濟、勝利判定、事件廣播 |
+| `WeaponBase.cs` | 工具基底類：OVRGrabbable 抓取狀態、Haptic 震動、控制器辨識 |
+| `Pickaxe.cs` | 鐵鎬 — 碰撞偵測、敲擊反饋、抓取狀態 log |
+| `Hammer.cs` | 鐵鎚 — **速度+距離**判定撞擊鐵砧（非碰撞事件） |
+| `RockFragment.cs` | 石頭本體 — 敲擊計數、掉礦、破碎流程、位置鎖定 |
+| `WeakPointCollisionBox.cs` | 弱點 — Trigger 偵測、顏色指示、升級同步、呼叫本體 `TriggerDestruction()` |
+| `AnvilStation.cs` | 鐵砧 — 鐵鎚敲擊計數、礦石檢查、觸發升級 |
+| `IronOre.cs` | 鐵礦 — 自動吸附、寬容期、掉出世界救援 |
 
-**主要成員：**
-```csharp
-public int oreCount                    // 已收集的鐵礦數
-public int upgradeLevel                // 升級等級 (0-3)
-public int totalRockFragments          // 場景中碎片總數
-public int destroyedFragments          // 已摧毀碎片數
+### 🎨 視覺與回饋
+| 腳本 | 職責 |
+|------|------|
+| `FeedbackManager.cs` | 全域音效 + 粒子 + 震動中樞，含程序化音效生成 |
+| `Debries.cs` | 石頭破碎後的散落碎屑 |
+| `ScreenShake.cs` | 相機震動 |
+| `SparkleGlowField.cs` / `SparkleMovement.cs` | 礦物閃光粒子 |
+| `RockLandingFeedback.cs` | 石頭掉落著地回饋 |
 
-public UnityEvent<int> OnOreCountChanged
-public UnityEvent<int> OnUpgradeLevelChanged
-public UnityEvent OnGameWon
-```
+### 🖥️ UI 與輔助
+| 腳本 | 職責 |
+|------|------|
+| `OreHUD.cs` | HUD — 礦數、升級等級、升級費用顯示 + 失敗閃爍 |
+| `StatueHideOnRightB.cs` | 雕像 debug 隱藏切換 |
+| `FullscreenVideoOnLeftY.cs` | 片頭影片切換 |
 
-**公開方法：**
-```csharp
-void AddOre(int amount = 1)           // 增加礦數，觸發 OnOreCountChanged
-void UpgradePickaxe()                 // 升級鐵鎬，廣播至所有碎片
-void RegisterFragmentDestroyed()      // 碎片摧毀時註冊
-void GetUpgradeLevel()                // 查詢當前升級等級
-```
-
-**使用方式：**
-- 拖到場景中空 GameObject 上
-- Inspector 指定 `Statue Object`（Gauss 雕像）
-- 設定 `Max Upgrade Level`（通常 3）
-
----
-
-### 2. RockFragment.cs
-**石頭碎片 — 敲擊與破裂邏輯**
-
-**職責：**
-- 敲擊計數
-- 破裂效果播放
-- 礦物生成與掉落
-- 升級等級同步
-
-**主要成員：**
-```csharp
-public int baseHits = 3               // 基礎敲擊次數（✅ 可在 Inspector 調整）
-public GameObject ironOrePrefab       // 掉落的礦物 prefab
-public ParticleSystem hitParticles    // 敲擊粒子
-public AudioClip hitSound             // 敲擊音效
-public GameObject debrisParticlePrefab // 碎石散落效果
-```
-
-**內部邏輯：**
-```
-敲擊碎片 (OnCollisionEnter tag="Pickaxe")
-  ↓
-Hit() 計數 +1
-  ↓
-播放粒子 + 音效
-  ↓
-hitCount >= currentHits ?
-  ├─ YES → 生成鐵礦 → 播放 Debries → 銷毀自己 → RegisterFragmentDestroyed()
-  └─ NO  → 繼續等待下一次敲擊
-```
-
-**✅ 快速修改：**
-| 參數 | Inspector 欄位 | 預設值 | 效果 |
-|------|:---------------:|:------:|------|
-| 敲擊次數 | `Base Hits` | 3 | 改為 2：更容易破碎；改為 5：更難 |
-| 掉落礦數 | `Ore Drop Count` | 1 | 改為 3：掉落更多礦 |
+### 🔌 系統基礎
+| 腳本 | 職責 |
+|------|------|
+| `OvrGrabberBootstrap.cs` | 自動配置 ControllerAnchor 的 OVRGrabber（Grab Volume 0.25m） |
 
 ---
 
-### 3. Pickaxe.cs
-**鐵鎬工具 — 抓取與碰撞控制**
+## 🎯 核心系統詳解
 
-**繼承：** `WeaponBase`（複用自 Ref 專案）
+### 1. 鐵礦經濟與升級系統（ArchaeologyGameManager）
 
-**職責：**
-- 抓取偵測
-- 碰撞觸發
-- 手柄振動反饋
+**升級公式：** `cost = baseUpgradeCost + upgradeCostIncrement × upgradeLevel`
 
-**主要成員：**
+預設值：
+- `Base Upgrade Cost` = 5
+- `Upgrade Cost Increment` = 5
+- 於是：Lv0→Lv1 需 5 礦，Lv1→Lv2 需 10 礦，Lv2→Lv3 需 15 礦
+- 滿級共需 **30 顆礦**
+
+**公開 API：**
 ```csharp
-public float pickaxeHapticAmplitude = 0.7f   // 振動強度 (0-1)
-public float pickaxeHapticDuration = 0.15f   // 振動時長 (秒)
+bool TrySpendOre(int amount)                // 扣礦，成功回傳 true
+bool UpgradePickaxe()                       // 嘗試升級，自動扣礦
+int GetCurrentUpgradeCost()                 // 下次升級費用
+bool HasEnoughOreForUpgrade()               // 礦數夠不夠
+bool IsAtMaxUpgrade()                       // 是否滿級
+
+UnityEvent<int> OnOreCountChanged           // HUD 用
+UnityEvent<int> OnUpgradeLevelChanged
+UnityEvent OnUpgradeFailed                  // HUD 紅字閃爍
+UnityEvent OnGameWon
 ```
 
-**邏輯：**
+### 2. 石頭雙擊破路徑（RockFragment + WeakPointCollisionBox）
+
+每顆石頭兩條 kill path，任一達成都觸發摧毀：
+
+| 部位 | 腳本 | Inspector 欄位 | 預設每級 |
+|------|------|----------------|:--------:|
+| 本體 | `RockFragment` | `Hits Per Level` | `[5, 4, 2, 1]` |
+| 弱點 | `WeakPointCollisionBox` | `Hits Per Level Weak` | `[3, 2, 1, 1]` |
+
+**升級同步：** `WeakPointCollisionBox` 訂閱 `OnUpgradeLevelChanged`，升級瞬間自動縮減閾值。
+
+**摧毀流程：** 兩條路徑最終都呼叫 `RockFragment.TriggerDestruction()`，共用掉礦 / 升級計數邏輯。
+
+### 3. 鐵礦掉落與拾取（RockFragment.SpawnOre + IronOre）
+
+**噴散參數（RockFragment）：**
+| 欄位 | 預設 | 說明 |
+|------|:---:|------|
+| `Ore Drop Count` | 3 | 每顆石頭掉幾顆礦 |
+| `Ore Spawn Height Offset` | 2.0m | 石頭上方 N 公尺生成（避免鑽地板） |
+| `Ore Upward Burst` | 1.5 m/s | 垂直彈射速度 |
+| `Ore Scatter Speed` | 1.2 m/s | 水平隨機方向散射 |
+| `Ore Spawn Jitter` | 0.15m | 隨機位置偏移（避免疊在一起） |
+
+**物理保險：** 礦石生成時自動 `Physics.IgnoreCollision` 與源石頭，避免卡 Collider 亂飛。
+
+**拾取流程（IronOre）：**
 ```
-持握鐵鎬 (IsHeld = true)
-  ↓
-碰撞石頭 (tag="Rock")
-  ↓
-觸發 Hit()
-  ↓
-播放 Haptic (振動)
+生成 → 噴散 → 落地滾一下（寬容期 4 秒，不吸附）
+      ↓
+寬容期結束 → 距離玩家 < 1m → 飛向玩家
+      ↓
+距離 < 0.3m → 自動拾取 → AddOre(+1)
 ```
 
-**✅ 快速調整：**
-```
-振動強度太弱？    → 改 pickaxeHapticAmplitude 為 0.9
-振動時間太短？    → 改 pickaxeHapticDuration 為 0.3
-```
+**防呆機制：**
+- `Fall Threshold` = -3m → 掉出世界自動飛向玩家
+- `Rescue After Seconds` = 8s → 卡住太久強制召回
 
----
+### 4. 鐵鎚擊打 Anvil（Hammer）
 
-### 4. Hammer.cs
-**錘子工具 — 升級台互動**
+因 OVRGrabbable 抓取時 Rigidbody 變 Kinematic，`OnCollisionEnter` 不觸發。改用**速度 + 距離**主動判定：
 
-**繼承：** `WeaponBase`
-
-**職責：**
-- 抓取偵測
-- 升級台碰撞檢測
-- 敲擊反饋
-
-**邏輯：**
-```
-持握錘子 (IsHeld = true)
-  ↓
-碰撞升級台 (AnvilStation 元件)
+```csharp
+每幀檢查：
+  IsHeld                         → 必須被握著
+  距離 anvil < strikeRadius      → 預設 0.5m
+  手部速度 > minStrikeSpeed      → 預設 0.1 m/s（簡易模擬器友善）
+  上次擊打 > strikeCooldown      → 預設 0.3 秒
   ↓
 呼叫 AnvilStation.Hit()
-  ↓
-播放 Haptic
 ```
 
----
+**Inspector 可調：**
+| 欄位 | 預設 | 說明 |
+|------|:---:|------|
+| `Strike Radius` | 1.0m | 判定距離，寬鬆設定 |
+| `Min Strike Speed` | 0.05 m/s | 最低揮動速度 |
+| `Strike Cooldown` | 0.3s | 連擊冷卻 |
 
-### 5. IronOre.cs
-**掉落的鐵礦 — 自動收集邏輯**
+### 5. Anvil 升級互動（AnvilStation）
 
-**職責：**
-- 距離檢測
-- 自動吸附移動
-- 收集通知
+敲打流程：
+```
+Hammer.Hit() 呼叫 anvil.Hit()
+  ↓
+檢查：是否已滿級？ → 是 → 播放 Fail 音效，返回
+  ↓
+檢查：鐵礦夠不夠？ → 不夠 → 播放 Fail 音效 + OnUpgradeFailed（HUD 紅字閃）
+  ↓
+hammerHits++ → 到達 hitsToUpgrade（預設 5）
+  ↓
+呼叫 gameManager.UpgradePickaxe()
+  ↓
+TrySpendOre(cost) → 成功 → upgradeLevel++ → 廣播所有 RockFragment
+```
 
-**主要成員：**
+### 6. HUD 系統（OreHUD）
+
+**World Space Canvas，parent 到 `CenterEyeAnchor`**，永遠在玩家視線前方 2m。
+
+**三行文字：**
+```
+Iron Ore: 12
+Upgrade Level: 1
+Next Upgrade: 5/10 Ore
+```
+
+**升級失敗時：** `UpgradeCostText` 紅字閃爍 0.6 秒。
+
+### 7. Layer 隔離系統
+
+解決 PlayerController 的 Capsule Collider 把工具/礦石撞飛的問題。
+
+**Layer 配置：**
+- `Tools`（User Layer 6）：Pickaxe、Hammer、PickaxeHead、HammerHead、Fluorite
+- `Default`：石頭、Anvil、地板
+- `Water`：PlayerController 所在 Layer
+
+**關鍵設定：** PlayerController 的 **Capsule Collider** → `Layer Overrides` → `Exclude Layers = Tools`。這樣 Capsule 不和 Tools 碰撞，但 OVRGrabber 的 Grab Volume Trigger 仍能偵測工具（Layer Collision Matrix 保持 Tools × Water = ✅）。
+
+### 8. 位置鎖（RockFragment.LateUpdate）
+
+石頭每幀自動回彈到出生位置：
+
 ```csharp
-public float pickupRange = 1.0f       // 自動吸附開始距離 (✅ 可調整)
-public float moveSpeed = 10f          // 吸附時移動速度
+LateUpdate:
+  if transform.position != lockedPosition:
+    transform.position = lockedPosition       ← 強制拉回
+    rb.linearVelocity = Vector3.zero
 ```
 
-**邏輯：**
-```
-礦物生成 (RockFragment 掉落)
-  ↓
-每幀檢查距離玩家 < pickupRange ?
-  ├─ YES → 向玩家移動
-  └─ NO  → 靜止等待
-  ↓
-距離 < 0.3m ?
-  ├─ YES → PickUp() → AddOre() → Destroy
-  └─ NO  → 繼續移動
-```
-
-**✅ 快速調整：**
-```
-礦物吸附距離太遠？  → 改 pickupRange 為 2.0
-吸附速度太快？      → 改 moveSpeed 為 5
-```
+**目的：** 即使有其他系統（或物理 bug）試圖推動石頭，`LateUpdate` 會立刻拉回。敲到 5/5 呼叫 `TriggerDestruction()` 時才解鎖。
 
 ---
 
-### 6. AnvilStation.cs
-**升級工作台 — 敲擊計數與升級觸發**
+## 🎛️ Inspector 參數速查表
 
-**職責：**
-- 敲擊次數計數
-- 升級閾值判定
-- 升級效果播放
+### 核心玩法平衡
 
-**主要成員：**
-```csharp
-public int hitsToUpgrade = 5          // 升級所需敲擊次數 (✅ 可調整)
-public AudioClip anvilSound           // 敲擊音效
-public ParticleSystem upgradeParticles // 升級粒子效果
-```
+| 物件 | 元件 | 欄位 | 預設 | 建議範圍 |
+|------|------|-------|:----:|:--------:|
+| ArchaeologyGameManager | ArchaeologyGameManager | `Base Upgrade Cost` | 5 | 3-10 |
+| ArchaeologyGameManager | ArchaeologyGameManager | `Upgrade Cost Increment` | 5 | 0-10 |
+| ArchaeologyGameManager | ArchaeologyGameManager | `Max Upgrade Level` | 3 | 2-5 |
+| 每顆 Rock | RockFragment | `Hits Per Level` | `[5,4,2,1]` | 自訂 |
+| 每顆 Rock | RockFragment | `Ore Drop Count` | 3 | 1-10 |
+| WeakPoint（每顆石頭底下） | WeakPointCollisionBox | `Hits Per Level Weak` | `[3,2,1,1]` | 自訂 |
+| Anvil | AnvilStation | `Hits To Upgrade` | 5 | 3-10 |
+| Pickaxe | Pickaxe | `Pickaxe Haptic Amplitude` | 0.7 | 0.3-1.0 |
+| Hammer | Hammer | `Strike Radius` | 1.0 | 0.3-1.5 |
+| Hammer | Hammer | `Min Strike Speed` | 0.05 | 0.05-2.0 |
+| Fluorite Prefab | IronOre | `Pickup Range` | 1.0 | 0.5-2.0 |
+| Fluorite Prefab | IronOre | `Pickup Delay` | 4s | 1-8s |
+| Fluorite Prefab | IronOre | `Rescue After Seconds` | 8s | 5-20s |
 
-**邏輯：**
-```
-錘子碰撞工作台 (Hammer.OnCollisionEnter)
-  ↓
-AnvilStation.Hit()
-  ↓
-hammerHits++
-  ↓
-hammerHits >= hitsToUpgrade ?
-  ├─ YES → ArchaeologyGameManager.UpgradePickaxe() → 重置計數
-  └─ NO  → 繼續計數
-```
+### Debug Log 開關
 
-**✅ 快速調整：**
-```
-升級太容易？    → 改 hitsToUpgrade 為 10
-升級太難？      → 改 hitsToUpgrade 為 3
-```
-
----
-
-### 7. OreHUD.cs
-**UI 顯示系統 — 實時更新介面**
-
-**職責：**
-- 事件訂閱
-- 文字更新
-- UI 同步
-
-**邏輯：**
-```
-Start() 訂閱 GameManager 事件
-  ↓
-礦數變化 (OnOreCountChanged)
-  ↓
-更新 TextMeshPro: "Iron Ore: {count}"
-  ↓
-升級發生 (OnUpgradeLevelChanged)
-  ↓
-更新 TextMeshPro: "Upgrade Level: {level}"
-```
-
----
-
-## ⚙️ 遊戲參數快速修改表
-
-**無需修改代碼，直接在 Inspector 調整：**
-
-| 參數 | 腳本 | Inspector 欄位 | 預設 | 建議範圍 | 效果 |
-|------|------|:---------------:|:----:|:-------:|------|
-| 敲擊次數 | RockFragment | Base Hits | 3 | 1-5 | ↓ 減少 = 更容易破碎 |
-| 升級次數 | AnvilStation | Hits To Upgrade | 5 | 3-10 | ↑ 增加 = 升級更難 |
-| 吸附範圍 | IronOre | Pickup Range | 1.0m | 0.5-2.0m | ↑ 增加 = 礦物吸附更遠 |
-| 吸附速度 | IronOre | Move Speed | 10 | 5-20 | ↑ 增加 = 吸附更快 |
-| 鐵鎬振動 | Pickaxe | Haptic Amplitude | 0.7 | 0.3-1.0 | ↑ 增加 = 振動更強 |
-| 鐵鎬時長 | Pickaxe | Haptic Duration | 0.15s | 0.1-0.3s | ↑ 增加 = 振動更久 |
-| 最大升級 | ArchaeologyGameManager | Max Upgrade Level | 3 | 2-5 | ↑ 增加 = 升級級數更多 |
-
-**修改步驟：**
-1. 在 Hierarchy 中點擊對應物件
-2. 在 Inspector 右側找到相應欄位
-3. 改變數值
-4. 按 Play 測試
+所有腳本的 log 都可在 Inspector 關閉：
+- `ArchaeologyGameManager.Log Manager`
+- `AnvilStation.Log Anvil`
+- `RockFragment.Log Rock Hits`
+- `IronOre.Log Pickup`
+- `Pickaxe.Log Pickaxe Hits`
+- `Hammer.Log Hammer`
+- `WeakPointCollisionBox.Log Weak Point Hits`
 
 ---
 
@@ -332,236 +304,154 @@ Start() 訂閱 GameManager 事件
 ```
 遊戲開始
   ↓
-玩家拿起鐵鎬 (Pickaxe.IsHeld = true)
+玩家抓鐵鎬（按住 Grip 鍵）
   ↓
-敲擊石頭碎片
-  ├─ 碎片計數 +1
-  ├─ 播放粒子 + 音效 + 振動
-  ├─ 掉落鐵礦 (3-5 個)
-  └─ 鐵礦自動吸附 → AddOre() → HUD 更新
+敲碎石頭（本體 × 5 或 弱點 × 3）
+  ├─ 播放擊中粒子 + 音效 + 震動
+  └─ hitCount 達到閾值 → TriggerDestruction()
   ↓
-重複敲擊直到碎片摧毀
-  └─ 碎片消失 → RegisterFragmentDestroyed()
+摧毀石頭 → 噴出 N 顆鐵礦（上方 2m 空中噴散）
   ↓
-收集足夠礦物後，拿起錘子 (Hammer.IsHeld = true)
+鐵礦落地 → 在地上躺 4 秒（可見）
   ↓
-敲擊升級工作台
-  ├─ 計數 +1
-  ├─ 播放音效 + 粒子
-  └─ 達到閾值 → UpgradePickaxe()
+玩家走近 < 1m → 礦石自動飛向玩家（< 0.3m 拾取）
   ↓
-升級後敲石頭更快
-  └─ RockFragment.baseHits - upgradeLevel
+AddOre → HUD 更新 → [GameManager] AddOre(+1) -> total=X
   ↓
-摧毀所有碎片
+（收集夠 5 顆後）玩家抓鐵鎚 → 走到 Anvil
   ↓
-Gauss_Statue.SetActive(true)
+揮動鐵鎚距離 < 1m、速度 > 0.05 m/s → 觸發 Hit()
+  ├─ 礦數不夠：播放 Fail 音效 + HUD 紅字閃爍
+  └─ 礦數夠：hammerHits++ → 到 5/5 → UpgradePickaxe()
   ↓
-遊戲勝利 ✨
+扣 5 礦 → upgradeLevel = 1 → 廣播所有石頭
+  ↓
+升級後敲石頭：本體 5→4 下、弱點 3→2 下
+  ↓
+重複挖礦 → 升到 Lv3（扣 5+10+15=30 礦）
+  ↓
+摧毀所有石頭 → Gauss_Statue.SetActive(true) → OnGameWon
 ```
 
 ---
 
 ## 🐛 常見問題與排除
 
-### ❌ 石頭無法被敲碎
+### ❌ 鐵鎬抓了就秒放
 
-**檢查項目：**
-- [ ] Pickaxe GameObject 的 `Tag` 是否為 `"Pickaxe"`？
-- [ ] 各碎片物件上是否都掛載了 `RockFragment.cs`？
-- [ ] Collider 設定是否正確（`Is Trigger = OFF`）？
-- [ ] ArchaeologyGameManager 是否在場景中且初始化成功？
-- [ ] Console 中是否有紅色錯誤？
+**原因：** PlayerController 的 Capsule Collider 與鐵鎬碰撞衝突。
+**解法：** 確認鐵鎬 Layer = Tools、PlayerController 的 Capsule Collider 的 `Layer Overrides → Exclude Layers` 包含 Tools。
 
-**解決方案：**
-```csharp
-// 在 Console 中手動測試
-ArchaeologyGameManager.Instance.AddOre(1);  // 應該增加礦數
-```
+### ❌ 敲石頭沒反應
 
----
+**檢查：**
+1. Pickaxe GameObject Tag = `Pickaxe`
+2. PickaxeHead 子物件有 Collider 且 Layer = Tools
+3. RockFragment Inspector 的 `Hits Per Level` 陣列有值
+4. Layer Collision Matrix 的 Tools × Default = ✅
 
-### ❌ 鐵礦無法被撿起
+### ❌ 敲碎石頭但沒掉礦
 
-**檢查項目：**
-- [ ] IronOre prefab 是否有 `Rigidbody`（重力啟用）？
-- [ ] 是否有 `Sphere Collider` 且 `Is Trigger = ON`？
-- [ ] `IronOre.cs` 是否正確掛載？
-- [ ] OVRCameraRig 是否存在於場景中？
+**檢查：**
+1. RockFragment Inspector 的 `Iron Ore Prefab` 欄位有拖入 `Fluorite.prefab`
+2. Fluorite Prefab 有掛 `IronOre.cs`
+3. Fluorite Prefab 有 Collider（非 Trigger）
 
-**測試方法：**
-1. Play Mode 中觀察礦物是否掉落
-2. 檢查 Console 是否有警告
+### ❌ 礦石看不到 / 瞬間消失
 
----
+**原因：** 礦石掉地板下（穿透），或被太快吸附。
+**解法：**
+- 調高 `Ore Spawn Height Offset`（如 3.0）
+- 調長 `Pickup Delay`（如 5-6 秒）
+- Console 看有沒有 `RESCUE triggered` 日誌（代表穿地板被救回）
 
-### ❌ 升級不起作用
+### ❌ 鐵鎚敲 Anvil 沒反應
 
-**檢查項目：**
-- [ ] AnvilStation GameObject 的 `Tag` 是否為 `"AnvilStation"`？
-- [ ] Hammer 物件是否掛載了 `Hammer.cs`？
-- [ ] 敲擊次數是否達到 `Hits To Upgrade` 閾值？
-- [ ] 是否正確呼叫了 `ArchaeologyGameManager.UpgradePickaxe()`？
-
-**Debug 方法：**
-```csharp
-// 在 AnvilStation.cs 中添加 Debug.Log
-Debug.Log($"AnvilStation.Hit() called. Hits: {hammerHits}/{hitsToUpgrade}");
-```
-
----
+**原因：** 新版 Hammer.cs 用速度+距離判定，參數太嚴。
+**解法：**
+- `Strike Radius` = 1.0
+- `Min Strike Speed` = 0.05
+- 確認 `anvil` GameObject 有掛 `AnvilStation.cs`
 
 ### ❌ HUD 不顯示
 
-**檢查項目：**
-- [ ] Canvas 是否啟用（Active = true）？
-- [ ] TextMeshPro 文字顏色是否與背景相同？
-- [ ] `OreHUD.cs` 是否正確初始化？
-- [ ] Inspector 欄位是否都有指派（Ore Count Text、Upgrade Level Text）？
+**檢查：**
+1. Canvas Render Mode = **World Space**（不是 Screen Space）
+2. Canvas Scale = `(0.005, 0.005, 0.005)`
+3. Canvas parent 到 `OVRCameraRig/TrackingSpace/CenterEyeAnchor`
+4. 每個 TextMeshPro 都指派 `LiberationSans SDF` Font Asset
+5. OreHUD 的三個 Text 欄位都拖入對應 TMP
 
-**快速修復：**
-1. 選中 TextMeshPro
-2. Inspector → Vertex Color → 改為白色或黑色
+### ❌ 石頭進場全飛走
 
----
-
-### ❌ 場景打包到 Quest 3 後性能不佳
-
-**優化建議：**
-1. 減少碎片數量（從 40 改為 20）
-2. 降低粒子效果細節
-3. 簡化掃描模型紋理
-4. 使用 Universal Render Pipeline (URP) 替代 Standard
+**原因：** 石頭 Collider 互相重疊，物理互相推擠。
+**解法：** `RockFragment.Awake()` 自動設 `FreezeAll + LateUpdate` 位置鎖（已內建），應該不會發生。若仍發生，檢查 Rigidbody 設定是否被手動改過。
 
 ---
 
-## 🔌 與其他系統的集成
+## 🔌 相依性與環境
 
-### 依賴的 Meta SDK 元件
+### Unity 版本
+- **Unity 6000.0.53f1** (Unity 6)
 
-| 元件 | 來源 | 用途 |
-|------|------|------|
-| `OVRGrabbable` | Meta OVR SDK | Pickaxe & Hammer 抓取 |
-| `OVRCameraRig` | Meta OVR SDK | 玩家視角與追蹤 |
-| `OVRInput` | Meta OVR SDK | 手柄輸入 |
-| `OVRInput.SetControllerVibration()` | Meta OVR SDK | Haptic 反饋 |
+### 主要套件
+- **Meta XR SDK 85.0.0** — OVRGrabbable、OVRGrabber、OVRCameraRig、Haptics
+- **TextMeshPro** — HUD 文字
+- **OpenXR** — XR 運行時
 
-### 複用的外部腳本
+### 目標平台
+- **Meta Quest 3**（主要目標）
+- Meta XR Simulator（編輯器測試）
 
-- **WeaponBase.cs** (`Ref/Space Invader MR 3/Assets/SpaceInvader/Script/`)
-  - Pickaxe 與 Hammer 繼承此類
-  - 提供 `IsHeld`、`GetHoldingController()`、`TriggerHaptic()` 等方法
-
----
-
-## 📊 性能指標
-
-| 指標 | 值 | 平台 |
-|------|:--:|------|
-| 腳本總行數 | ~430 | C# |
-| 場景物件數 | 50-100 | Quest 3 |
-| 掃描模型多邊形 | ~50K | Gauss (5.3MB) + Environment (16MB) |
-| 目標 FPS | 90 | Meta Quest 3 |
-| 內存佔用 | ~800MB | Quest 3 Standalone |
-
-**優化策略：**
-- 使用 LOD (Level of Detail) 簡化遠距離模型
-- Batching 減少 Draw Call
-- 非必要粒子可禁用
+### 複用外部
+- `WeaponBase.cs` — 繼承自 `Ref/Space Invader MR 3` 專案的武器基底類
 
 ---
 
-## 🚀 後續開發建議
-
-### 短期（1-2 週）
-- [ ] 新增主菜單與暫停功能
-- [ ] 調整遊戲難度參數
-- [ ] 增加音效與音樂
-- [ ] 性能優化與 Quest 3 測試
-
-### 中期（1 個月）
-- [ ] 多場景系統（菜單、遊戲、結果）
-- [ ] 進度保存系統
-- [ ] 排行榜
-- [ ] 難度選擇（簡單/中等/困難）
-
-### 長期（2-3 個月）
-- [ ] 多人協作模式
-- [ ] 更複雜的環境破壞
-- [ ] NPC 與劇情
-- [ ] 應用內商店
-
----
-
-## 📝 修改代碼的最佳實踐
+## 📝 修改程式碼的最佳實踐
 
 ### 添加新功能時
 
-1. **不要直接改 Singleton 的初始化**
-   ```csharp
-   // ❌ 錯誤
-   public void SetOreCount(int value) { oreCount = value; }
-   
-   // ✅ 正確
-   public void AddOre(int amount) { oreCount += amount; OnOreCountChanged.Invoke(oreCount); }
-   ```
-
-2. **使用事件系統溝通**
-   ```csharp
-   // ✅ 好
-   ArchaeologyGameManager.Instance.OnOreCountChanged.AddListener(UpdateUI);
-   
-   // ❌ 避免
-   UpdateUI(ArchaeologyGameManager.Instance.oreCount);  // 緊耦合
-   ```
-
-3. **始終 Null-check**
-   ```csharp
-   if (gameManager != null) {
-       gameManager.RegisterFragmentDestroyed();
-   }
-   ```
-
-### 修改參數時
-
-**永遠在 Inspector 調整，不要改代碼：**
+**Singleton 互動：**
 ```csharp
-// ❌ 不要這樣做
-private int baseHits = 5;  // 改值在代碼中
+// ✅ 推薦：事件系統
+ArchaeologyGameManager.Instance.OnOreCountChanged.AddListener(MyHandler);
 
-// ✅ 應該這樣做
-[SerializeField] private int baseHits = 3;  // 改值在 Inspector 中
+// ❌ 避免：緊耦合
+UpdateUI(ArchaeologyGameManager.Instance.GetOreCount());
 ```
+
+**新增配置參數：**
+```csharp
+// ✅ 使用 SerializeField 暴露給 Inspector
+[SerializeField] private int myConfig = 5;
+
+// ❌ 不要硬編碼
+private int myConfig = 5;
+```
+
+**擴展 RockFragment / WeakPointCollisionBox：**
+兩個腳本都通過 `RockFragment.TriggerDestruction()` 統一進入破壞流程。新增第三種摧毀方式時，同樣呼叫這個 public 方法。
 
 ---
 
-## 📞 技術支援
+## 📖 相關文件
 
-### 查詢相應文檔
-
-| 問題 | 查詢文檔 |
-|------|---------|
-| 「怎麼建立場景？」 | TUTORIAL_ZH.md |
-| 「怎麼修改敲擊次數？」 | 本檔案「遊戲參數快速修改表」 |
-| 「項目結構是什麼？」 | PROJECT_STRUCTURE.md |
-| 「怎麼配置物件？」 | TUTORIAL_ZH.md「配置遊戲物件」章節 |
-| 「我遇到了錯誤」 | 本檔案「常見問題與排除」 |
+| 文件 | 內容 |
+|------|------|
+| `README.md` | 本檔案 — 系統概覽 |
+| `UPGRADE_SYSTEM_SETUP.md` | Inspector 設定、測試流程、Debug log 指南 |
 
 ---
 
 <div align="center">
 
-## 📖 文檔導航
-
-[🚀 快速開始](GET_STARTED.md) · [📚 完整教學](TUTORIAL_ZH.md) · [🏗️ 專案結構](PROJECT_STRUCTURE.md) · [✅ 進度清單](COMPLETION_CHECKLIST.md) · [📑 文檔索引](INDEX.md)
+**版本：** 0.2.0-alpha
+**最後更新：** 2026-04-23
+**授權：** MIT
 
 ---
 
-**版本：** 0.1.0-alpha  
-**最後更新：** 2026-04-08  
-**授權：** MIT  
-**作者：** Claude Code + 開發團隊  
-
-**準備好了嗎？** [開始閱讀 TUTORIAL_ZH.md →](TUTORIAL_ZH.md)
+**準備好了嗎？** 打開 Unity 進入 `Assets/Scenes/ArchaeologyGame.unity` 開始挖礦！
 
 </div>

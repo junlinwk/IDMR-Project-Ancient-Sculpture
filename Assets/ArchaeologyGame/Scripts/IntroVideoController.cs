@@ -1,144 +1,258 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Video;
 
 /// <summary>
-/// Plays an intro video on game start, hides the HUD until the video finishes,
-/// then reveals the HUD for gameplay. Supports user skip via controller button or keyboard.
+/// Gates gameplay behind an intro video. Supports two start modes:
+///   • Auto      — video plays as soon as the scene loads.
+///   • ButtonPress — screen is dark until the player presses the trigger button.
+///
+/// Includes fade-in / fade-out transitions between the video and the HUD so the
+/// handover isn't a hard cut. Requires a CanvasGroup on each canvas (added
+/// automatically at runtime if missing).
 /// </summary>
 public class IntroVideoController : MonoBehaviour
 {
+    public enum StartMode
+    {
+        Auto,
+        ButtonPress
+    }
+
     [Header("References")]
     [Tooltip("Video player that will play the intro.")]
     [SerializeField] private VideoPlayer videoPlayer;
-    [Tooltip("The Canvas / GameObject that contains the video display (will be hidden after playback).")]
+    [Tooltip("Canvas containing the video RawImage. Alpha is controlled via its CanvasGroup.")]
     [SerializeField] private GameObject videoCanvas;
-    [Tooltip("The HUD Canvas (OreHUD_Canvas). Will be hidden until intro finishes.")]
+    [Tooltip("HUD canvas (OreHUD_Canvas). Starts hidden, fades in after the intro.")]
     [SerializeField] private GameObject hudCanvas;
 
-    [Header("Settings")]
-    [Tooltip("If true, the intro starts automatically when the scene loads.")]
-    [SerializeField] private bool autoPlayOnStart = true;
-    [Tooltip("If true, player can press the skip button/key to end the intro early.")]
+    [Header("Start Mode")]
+    [SerializeField] private StartMode startMode = StartMode.ButtonPress;
+
+    [Header("Trigger (Button Press mode)")]
+    [Tooltip("Controller button that starts the video.")]
+    [SerializeField] private OVRInput.Button triggerButton = OVRInput.Button.PrimaryIndexTrigger;
+    [SerializeField] private OVRInput.Controller triggerController = OVRInput.Controller.RTouch;
+    [Tooltip("Keyboard key used in the Unity editor as a fallback.")]
+    [SerializeField] private KeyCode editorTriggerKey = KeyCode.Space;
+
+    [Header("Skip (during playback)")]
     [SerializeField] private bool allowSkip = true;
-    [SerializeField] private OVRInput.Button skipButton = OVRInput.Button.One; // A button on RTouch
+    [SerializeField] private OVRInput.Button skipButton = OVRInput.Button.One;
     [SerializeField] private OVRInput.Controller skipController = OVRInput.Controller.RTouch;
     [SerializeField] private KeyCode editorSkipKey = KeyCode.Space;
+
+    [Header("Fade Settings")]
+    [Tooltip("Seconds for the video canvas to fade in after trigger / at scene start.")]
+    [SerializeField] private float videoFadeInDuration = 0.6f;
+    [Tooltip("Seconds for the video canvas to fade out before the HUD appears.")]
+    [SerializeField] private float videoFadeOutDuration = 0.8f;
+    [Tooltip("Seconds for the HUD to fade in after the video finishes.")]
+    [SerializeField] private float hudFadeInDuration = 0.5f;
 
     [Header("Debug")]
     [SerializeField] private bool logIntro = true;
 
-    private bool introPlaying = false;
+    private CanvasGroup videoGroup;
+    private CanvasGroup hudGroup;
+    private bool awaitingTrigger = false;
+    private bool playbackStarted = false;
+    private bool introFinished = false;
 
     private void Start()
     {
-        // HUD starts hidden so the player only sees the intro video.
-        if (hudCanvas != null)
+        // Grab (or create) CanvasGroup so we can fade with alpha instead of popping.
+        videoGroup = EnsureCanvasGroup(videoCanvas);
+        hudGroup = EnsureCanvasGroup(hudCanvas);
+
+        // HUD starts invisible. We still keep the GameObject active so event
+        // subscriptions (OreHUD, etc.) run from the beginning.
+        if (hudGroup != null)
         {
-            hudCanvas.SetActive(false);
+            hudGroup.alpha = 0f;
+            hudGroup.blocksRaycasts = false;
+            hudGroup.interactable = false;
         }
 
-        if (autoPlayOnStart && videoPlayer != null)
-        {
-            StartIntro();
-        }
-        else
-        {
-            // No intro configured — reveal HUD immediately so gameplay still works.
-            RevealHUD();
-        }
-    }
-
-    private void StartIntro()
-    {
         if (videoCanvas != null)
         {
             videoCanvas.SetActive(true);
+
+            // Defensive: legacy scripts (e.g. FullscreenVideoOnLeftY.Awake) may
+            // have disabled the RawImage or its GameObject before our Start ran.
+            // Awake fires even for disabled components, so unchecking them in
+            // the Inspector isn't enough — we force-enable them here.
+            UnityEngine.UI.RawImage[] rawImages = videoCanvas.GetComponentsInChildren<UnityEngine.UI.RawImage>(true);
+            foreach (UnityEngine.UI.RawImage ri in rawImages)
+            {
+                if (ri == null) continue;
+                if (!ri.gameObject.activeSelf) ri.gameObject.SetActive(true);
+                if (!ri.enabled) ri.enabled = true;
+            }
+            if (logIntro && rawImages.Length > 0)
+            {
+                Debug.Log($"[IntroVideo] Ensured {rawImages.Length} RawImage(s) enabled in video canvas.");
+            }
+        }
+        if (videoGroup != null)
+        {
+            videoGroup.alpha = 0f;
         }
 
-        introPlaying = true;
+        if (videoPlayer == null)
+        {
+            Debug.LogWarning("[IntroVideo] No VideoPlayer assigned — skipping intro.");
+            RevealHudImmediate();
+            return;
+        }
 
         videoPlayer.playOnAwake = false;
         videoPlayer.isLooping = false;
         videoPlayer.loopPointReached += OnVideoEnded;
         videoPlayer.errorReceived += OnVideoError;
-        videoPlayer.Play();
 
-        if (logIntro)
+        if (startMode == StartMode.Auto)
         {
-            Debug.Log("[IntroVideo] Intro started. HUD hidden until video finishes.");
+            StartIntro();
         }
-    }
-
-    private void OnVideoEnded(VideoPlayer vp)
-    {
-        if (logIntro)
+        else
         {
-            Debug.Log("[IntroVideo] Video finished naturally.");
-        }
-        EndIntro();
-    }
-
-    private void OnVideoError(VideoPlayer vp, string message)
-    {
-        Debug.LogError($"[IntroVideo] Video error: {message}. Skipping intro so gameplay can proceed.");
-        EndIntro();
-    }
-
-    private void Update()
-    {
-        if (!introPlaying || !allowSkip)
-        {
-            return;
-        }
-
-        bool skipped = OVRInput.GetDown(skipButton, skipController) ||
-                       (Application.isEditor && Input.GetKeyDown(editorSkipKey));
-
-        if (skipped)
-        {
+            awaitingTrigger = true;
             if (logIntro)
             {
-                Debug.Log("[IntroVideo] Skipped by player input.");
+                Debug.Log($"[IntroVideo] Waiting for {triggerButton} (or {editorTriggerKey} in editor) to start intro.");
             }
-            if (videoPlayer != null)
-            {
-                videoPlayer.Stop();
-            }
-            EndIntro();
         }
     }
 
-    private void EndIntro()
+    private void OnDestroy()
     {
-        if (!introPlaying)
-        {
-            return;
-        }
-        introPlaying = false;
-
         if (videoPlayer != null)
         {
             videoPlayer.loopPointReached -= OnVideoEnded;
             videoPlayer.errorReceived -= OnVideoError;
         }
+    }
+
+    private void Update()
+    {
+        if (awaitingTrigger && TriggerPressed())
+        {
+            awaitingTrigger = false;
+            StartIntro();
+            return;
+        }
+
+        if (playbackStarted && !introFinished && allowSkip && SkipPressed())
+        {
+            if (logIntro) Debug.Log("[IntroVideo] Skipped by player input.");
+            if (videoPlayer != null) videoPlayer.Stop();
+            StartCoroutine(EndIntroRoutine());
+        }
+    }
+
+    private bool TriggerPressed()
+    {
+        if (OVRInput.GetDown(triggerButton, triggerController)) return true;
+        if (Application.isEditor && Input.GetKeyDown(editorTriggerKey)) return true;
+        return false;
+    }
+
+    private bool SkipPressed()
+    {
+        if (OVRInput.GetDown(skipButton, skipController)) return true;
+        if (Application.isEditor && Input.GetKeyDown(editorSkipKey)) return true;
+        return false;
+    }
+
+    private void StartIntro()
+    {
+        if (playbackStarted) return;
+        playbackStarted = true;
+
+        if (logIntro) Debug.Log("[IntroVideo] Starting playback.");
+        videoPlayer.Play();
+        StartCoroutine(FadeCanvasGroup(videoGroup, 0f, 1f, videoFadeInDuration));
+    }
+
+    private void OnVideoEnded(VideoPlayer vp)
+    {
+        if (introFinished) return;
+        if (logIntro) Debug.Log("[IntroVideo] Video finished naturally.");
+        StartCoroutine(EndIntroRoutine());
+    }
+
+    private void OnVideoError(VideoPlayer vp, string message)
+    {
+        Debug.LogError($"[IntroVideo] Video error: {message}. Revealing HUD so gameplay can proceed.");
+        if (!introFinished)
+        {
+            StartCoroutine(EndIntroRoutine());
+        }
+    }
+
+    private IEnumerator EndIntroRoutine()
+    {
+        if (introFinished) yield break;
+        introFinished = true;
+
+        yield return StartCoroutine(FadeCanvasGroup(videoGroup, 1f, 0f, videoFadeOutDuration));
 
         if (videoCanvas != null)
         {
             videoCanvas.SetActive(false);
         }
 
-        RevealHUD();
+        yield return StartCoroutine(FadeCanvasGroup(hudGroup, 0f, 1f, hudFadeInDuration));
+
+        if (hudGroup != null)
+        {
+            hudGroup.blocksRaycasts = true;
+            hudGroup.interactable = true;
+        }
+
+        if (logIntro) Debug.Log("[IntroVideo] HUD revealed. Gameplay ready.");
     }
 
-    private void RevealHUD()
+    private void RevealHudImmediate()
     {
-        if (hudCanvas != null)
+        if (videoCanvas != null) videoCanvas.SetActive(false);
+        if (hudGroup != null)
         {
-            hudCanvas.SetActive(true);
+            hudGroup.alpha = 1f;
+            hudGroup.blocksRaycasts = true;
+            hudGroup.interactable = true;
         }
-        if (logIntro)
+    }
+
+    private IEnumerator FadeCanvasGroup(CanvasGroup group, float from, float to, float duration)
+    {
+        if (group == null || duration <= 0f)
         {
-            Debug.Log("[IntroVideo] HUD revealed. Gameplay ready.");
+            if (group != null) group.alpha = to;
+            yield break;
         }
+
+        float elapsed = 0f;
+        group.alpha = from;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            group.alpha = Mathf.Lerp(from, to, elapsed / duration);
+            yield return null;
+        }
+        group.alpha = to;
+    }
+
+    private CanvasGroup EnsureCanvasGroup(GameObject go)
+    {
+        if (go == null) return null;
+        CanvasGroup cg = go.GetComponent<CanvasGroup>();
+        if (cg == null)
+        {
+            cg = go.AddComponent<CanvasGroup>();
+        }
+        return cg;
     }
 }

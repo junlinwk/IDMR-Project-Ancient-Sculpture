@@ -51,6 +51,12 @@ public class IntroVideoController : MonoBehaviour
     [Tooltip("Seconds for the HUD to fade in after the video finishes.")]
     [SerializeField] private float hudFadeInDuration = 0.5f;
 
+    [Header("Post-Intro Activation")]
+    [Tooltip("Objects/components to enable once the intro finishes (e.g. gameplay controllers, calibrator).")]
+    [SerializeField] private GameObject[] enableOnFinish;
+    [Tooltip("EnvironmentSpatialAnchor2Point instances whose input should unlock after the intro.")]
+    [SerializeField] private EnvironmentSpatialAnchor2Point[] unlockCalibratorsOnFinish;
+
     [Header("Debug")]
     [SerializeField] private bool logIntro = true;
 
@@ -210,6 +216,24 @@ public class IntroVideoController : MonoBehaviour
         {
             hudGroup.blocksRaycasts = true;
             hudGroup.interactable = true;
+        }
+
+        // Unlock anything that was gated behind the intro — e.g. the spatial
+        // anchor calibrator which shouldn't listen for button presses while
+        // the video is playing.
+        if (enableOnFinish != null)
+        {
+            foreach (GameObject go in enableOnFinish)
+            {
+                if (go != null && !go.activeSelf) go.SetActive(true);
+            }
+        }
+        if (unlockCalibratorsOnFinish != null)
+        {
+            foreach (EnvironmentSpatialAnchor2Point cal in unlockCalibratorsOnFinish)
+            {
+                if (cal != null) cal.EnableInput();
+            }
         }
 
         if (logIntro) Debug.Log("[IntroVideo] HUD revealed. Gameplay ready.");

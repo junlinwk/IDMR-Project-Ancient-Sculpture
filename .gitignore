@@ -50,3 +50,32 @@ Thumbs.db
 
 /[Uu]ser[Ss]ettings/
 IDMR-Project-Ancient-Sculpture.slnx
+
+# Unity cache / build generated (VERY IMPORTANT)
+.utmp/
+Build/
+Builds/
+Logs/
+MemoryCaptures/
+
+# Meta / Oculus / SDK samples (SAFE TO IGNORE IF NOT MODIFYING)
+Assets/Oculus/
+Assets/Samples/
+Assets/Meta*/
+
+# Large binary files
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+*.hdr
+*.exr
+*.blob
+
+# Android / IL2CPP build junk
+*.gradle
+*.apk
+*.aab
+*.so
+*.dll

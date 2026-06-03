@@ -59,12 +59,10 @@ Logs/
 MemoryCaptures/
 
 # Large binary files
-*.zip
 *.rar
 *.7z
 *.tar
 *.gz
-*.hdr
 *.exr
 *.blob
 
